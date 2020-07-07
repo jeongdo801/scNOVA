@@ -11,6 +11,7 @@ PART0. Extract single-cell and subclonal copy-number variations
 PART1. Infer transcriptome with pseudo-bulk population
   - Feature1 : samtools merge for pseudo-bulk NO, Strand_seq_deeptool_Genes_for_CNN.pl
     - Make_ML_Features_BCLL01 (processing and normalization to make Feature1)
+    - For normalization total mapped read needs to be calculated (Strand_seq_deeptool_chr_length.pl)
   - Feature2 : single-cell variance : Deeptool_matrix_CNN_C0.R
   - Combine five layers of feature sets
 <br/><br/>
