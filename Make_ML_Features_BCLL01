@@ -1,0 +1,322 @@
+Strand_seq_epigenome_computational_analysis_20190411.pptx
+/g/korbel2/StrandSeq/Test_HJ/Files_ASE/Features_BCLL01
+#----------------------------------------------------------------------------------------------------------------
+#Sort deeptool result by coordinate and then cbind peak number and then sort by peak number and then reshape into (19770*150) chrM 13 genes excluded : BCLL01
+#----------------------------------------------------------------------------------------------------------------
+
+
+-bash-4.2$ sort -k1,1 -k2,2n -k3,3n -t$'\t' Deeptool_Genes_for_CNN_merge_BCLL01_v2.tab > Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort.txt
+
+Deeptool_result <- read.table("Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort.txt", header=TRUE, sep ='\t', comment.char = "")
+Deeptool_result_new <- Deeptool_result[,4:ncol(Deeptool_result)]
+Ref_bed <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_num_sort.txt", header=F, sep ='\t', comment.char = "")
+
+Deeptool_result_woM <- Deeptool_result[Deeptool_result[,1]!="chrM",]
+Deeptool_result_new_woM <- Deeptool_result_new[Deeptool_result[,1]!="chrM",]
+Ref_bed_woM <- Ref_bed[Ref_bed[,1]!="chrM",]
+
+
+Deeptool_result_lab <- cbind(Deeptool_result_woM[,1:3], Ref_bed_woM[,4], Deeptool_result_new_woM)
+write.table(Deeptool_result_lab, "Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort_lab.txt", row.names = FALSE, col.names = TRUE, sep="\t", quote = FALSE)
+
+-bash-4.2$ sort -k4,4n -t$'\t' Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort_lab.txt > Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort_lab_final.txt
+
+library(pracma)
+Deeptool_result_final <- read.table("Deeptool_Genes_for_CNN_merge_BCLL01_v2_sort_lab_final.txt", header=TRUE, sep ='\t', comment.char = "")
+#Deeptool_result_final_reshape_BCLL01_C0 <- t(Reshape(Deeptool_result_final[,5], 150, (19770-13)))
+#Deeptool_result_final_reshape_BCLL01_C1 <- t(Reshape(Deeptool_result_final[,6], 150, (19770-13)))
+#Deeptool_result_final_reshape_BCLL01_C2 <- t(Reshape(Deeptool_result_final[,7], 150, (19770-13)))
+Deeptool_result_final_reshape_BCLL01_C3 <- t(Reshape(Deeptool_result_final[,8], 150, (19770-13)))
+#write.table(Deeptool_result_final_reshape_BCLL01_C0, "Features_reshape_BCLL01_C0.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+#write.table(Deeptool_result_final_reshape_BCLL01_C1, "Features_reshape_BCLL01_C1.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+#write.table(Deeptool_result_final_reshape_BCLL01_C2, "Features_reshape_BCLL01_C2.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(Deeptool_result_final_reshape_BCLL01_C3, "Features_reshape_BCLL01_C3.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Change orientation of the features according to the strand information of the genes
+#----------------------------------------------------------------------------------------------------------------
+CNN_features_annot <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_original <- read.table("Features_reshape_BCLL01_C3.txt", header=F, sep ='\t', comment.char = "")
+table_final <- as.data.frame(matrix(0, nrow(table_original), ncol(table_original)))
+for (i in 1:nrow(table_original)){
+	if (CNN_features_annot[i,6]=="+"){table_final[i,] <- table_original[i,]}
+	if (CNN_features_annot[i,6]=="-"){
+		tmp <- table_original[i,c(150:1)]
+		colnames(tmp) <- colnames(table_original)
+		table_final[i,] <- tmp
+		}
+	cat(paste0(i, ' '))
+}
+write.table(table_final, "Features_reshape_BCLL01_C3_orientation.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+#----------------------------------------------------------------------------------------------------------------
+#Length normalization and make Genebody plot based on RNA levels
+#----------------------------------------------------------------------------------------------------------------
+#library size : This need to be calculated from entire genome ## /Users/jeong/Documents/Strand_Seq/Strand_Seq_List2.xlsx
+#length : This will be calculated from bin by bin
+#GC : do we need this normalization or not if we have GC as a feature?
+
+mapped_read <- 1881542 ##This parameter need to be changed for each samples
+
+
+setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_SCDE')
+CNN_features_annot <- read.table("bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_mononuc <- read.table("Features_reshape_BCLL01_C3_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_CpG <- read.table("Features_reshape_CpG_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_GC <- read.table("Features_reshape_GC_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_size <- read.table("Features_reshape_size_orientation.txt", header=F, sep ='\t', comment.char = "")  
+TSS_matrix <- read.table("Strand_seq_matrix_TSS_for_SVM.txt", header=TRUE, sep ='\t')
+
+setwd('/Users/jeong/Documents/Strand_Seq/RNA_seq/htseq_DEanalysis_2019_renamed')
+FPKM <- read.table("FPKM_sort_LCL_RPE_19770_renamed.txt", header=T, sep ='\t', comment.char = "")
+TSS_matrix_woM <- TSS_matrix[TSS_matrix[,2]!="chrM",]
+FPKM_woM <- FPKM[TSS_matrix[,2]!="chrM",]
+
+
+
+##smooth spline fit for the length normalization
+
+table_size_flat <- matrix(0, 1, 1)
+for (i in 1:ncol(table_size)){
+table_size_flat <- rbind(table_size_flat, as.matrix(table_size[,i]))
+}
+table_size_flat <- table_size_flat[-1,]
+
+table_mononuc_flat <- matrix(0, 1, 1)
+for (i in 1:ncol(table_mononuc)){
+table_mononuc_flat <- rbind(table_mononuc_flat, as.matrix(table_mononuc[,i]))
+}
+table_mononuc_flat <- table_mononuc_flat[-1,]
+
+
+
+##Fit smooth spline (length vs. ratio to the mean) , alternative mode (log2 scale)
+Input_norm <- table_mononuc_flat
+Input_norm_sizenorm_mode2 <- matrix(0, length(Input_norm), 1)
+Input_norm_log <- log2(Input_norm+1) #log2 conversion with pseudocount 1
+
+
+	plot(table_size_flat, (Input_norm_log-(mean(Input_norm_log))), xlab="size (bp)", ylab="log2(RPM/mean)")
+	fit1<-smooth.spline(table_size_flat, (Input_norm_log-(mean(Input_norm_log))), df=16)
+	lines(fit1,col="red",lwd=2)
+
+	Input_norm_log_sub<-Input_norm_log
+	Input_size_sub<-table_size_flat
+	ratio_norm_log<-matrix(0, length(Input_norm_log_sub),1)
+	a<-predict(fit1, Input_size_sub)
+	ratio_norm_log[,1] <- Input_norm_log_sub-mean(Input_norm_log)-a$y
+	Input_norm_sizenorm_mode2[,1] <- ratio_norm_log[,1] + mean(Input_norm_log)
+
+	plot(table_size_flat, ratio_norm_log, main="size normalized", xlab="size (bp)", ylab="log2(RPM/mean)")
+	fit1_norm<-smooth.spline(table_size_flat, ratio_norm_log,df=16)
+	lines(fit1_norm,col="red",lwd=2)
+
+library(pracma)
+table_mononuc_norm_length <- Reshape(2^Input_norm_sizenorm_mode2-1, (19770-13), 150)
+table_mononuc_norm <- table_mononuc
+
+
+##plotting script
+##library size normalization to calculate RPM (read per million mapped read)
+
+table_mononuc_norm <- table_mononuc_norm_length
+plot(c(1:150), colMeans(table_mononuc_norm), type="o")
+plot(c(1:150), colMeans(table_mononuc_norm*1000000/mapped_read), type="o")
+table_mononuc_norm2 <- table_mononuc_norm*1000000/mapped_read
+
+data_exp <- rowMeans(FPKM_woM[,1:9]) ##This parameter need to be changed for each samples
+avg_multi <- matrix(0, 5, 150)
+avg_multi[1,] <-colMeans(table_mononuc_norm2[data_exp==0,])
+avg_multi[2,] <-colMeans(table_mononuc_norm2[data_exp>0 & data_exp<0.1,])
+avg_multi[3,] <-colMeans(table_mononuc_norm2[data_exp>0.1 & data_exp<=1,])
+avg_multi[4,] <-colMeans(table_mononuc_norm2[data_exp>1 & data_exp<=3,])
+avg_multi[5,] <-colMeans(table_mononuc_norm2[data_exp>3,])
+
+position <- 1:150
+
+plot(position, avg_multi[1,], type="o",col='gray', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[2,], type="o",col='blue', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[3,], type="o",col='green', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[4,], type="o",col='orange', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[5,], type="o",col='red', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+
+
+
+##save the normalized result
+setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_SCDE')
+write.table(table_mononuc_norm2, "Features_reshape_BCLL01_C3_orientation_norm.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+
+
+
+
+
+
+
+---------------------------------------------------
+##20200707 Analysis of plate1 + plate2 (/g/korbel/jeong/Files_ASE/Features_BCLL01_P1P2)
+---------------------------------------------------
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Sort deeptool result by coordinate and then cbind peak number and then sort by peak number and then reshape into (19770*150) chrM 13 genes excluded : BCLL01
+#----------------------------------------------------------------------------------------------------------------
+
+
+-bash-4.2$ sort -k1,1 -k2,2n -k3,3n -t$'\t' Deeptool_Genes_for_CNN_merge_BCLL01_P1P2.tab > Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort.txt
+
+Deeptool_result <- read.table("Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort.txt", header=TRUE, sep ='\t', comment.char = "")
+Deeptool_result_new <- Deeptool_result[,4:ncol(Deeptool_result)]
+Ref_bed <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_num_sort.txt", header=F, sep ='\t', comment.char = "")
+
+Deeptool_result_woM <- Deeptool_result[Deeptool_result[,1]!="chrM",]
+Deeptool_result_new_woM <- Deeptool_result_new[Deeptool_result[,1]!="chrM",]
+Ref_bed_woM <- Ref_bed[Ref_bed[,1]!="chrM",]
+
+
+Deeptool_result_lab <- cbind(Deeptool_result_woM[,1:3], Ref_bed_woM[,4], Deeptool_result_new_woM)
+write.table(Deeptool_result_lab, "Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort_lab.txt", row.names = FALSE, col.names = TRUE, sep="\t", quote = FALSE)
+
+-bash-4.2$ sort -k4,4n -t$'\t' Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort_lab.txt > Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort_lab_final.txt
+
+library(pracma)
+Deeptool_result_final <- read.table("Deeptool_Genes_for_CNN_merge_BCLL01_P1P2_sort_lab_final.txt", header=TRUE, sep ='\t', comment.char = "")
+Deeptool_result_final_reshape_BCLL01_C0 <- t(Reshape(Deeptool_result_final[,5], 150, (19770-13)))
+Deeptool_result_final_reshape_BCLL01_C1 <- t(Reshape(Deeptool_result_final[,6], 150, (19770-13)))
+Deeptool_result_final_reshape_BCLL01_C2 <- t(Reshape(Deeptool_result_final[,7], 150, (19770-13)))
+Deeptool_result_final_reshape_BCLL01_C3 <- t(Reshape(Deeptool_result_final[,8], 150, (19770-13)))
+Deeptool_result_final_reshape_BCLL01_C4 <- t(Reshape(Deeptool_result_final[,9], 150, (19770-13)))
+write.table(Deeptool_result_final_reshape_BCLL01_C0, "Features_reshape_BCLL01_P1P2_C0.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(Deeptool_result_final_reshape_BCLL01_C1, "Features_reshape_BCLL01_P1P2_C1.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(Deeptool_result_final_reshape_BCLL01_C2, "Features_reshape_BCLL01_P1P2_C2.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(Deeptool_result_final_reshape_BCLL01_C3, "Features_reshape_BCLL01_P1P2_C3.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(Deeptool_result_final_reshape_BCLL01_C4, "Features_reshape_BCLL01_P1P2_C4.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Change orientation of the features according to the strand information of the genes
+#----------------------------------------------------------------------------------------------------------------
+CNN_features_annot <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_original <- read.table("Features_reshape_BCLL01_P1P2_C0.txt", header=F, sep ='\t', comment.char = "")
+table_final <- as.data.frame(matrix(0, nrow(table_original), ncol(table_original)))
+for (i in 1:nrow(table_original)){
+	if (CNN_features_annot[i,6]=="+"){table_final[i,] <- table_original[i,]}
+	if (CNN_features_annot[i,6]=="-"){
+		tmp <- table_original[i,c(150:1)]
+		colnames(tmp) <- colnames(table_original)
+		table_final[i,] <- tmp
+		}
+	cat(paste0(i, ' '))
+}
+write.table(table_final, "Features_reshape_BCLL01_P1P2_C0_orientation.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+#----------------------------------------------------------------------------------------------------------------
+#Length normalization and make Genebody plot based on RNA levels
+#----------------------------------------------------------------------------------------------------------------
+#library size : This need to be calculated from entire genome ## /Users/jeong/Documents/Strand_Seq/Strand_Seq_List2.xlsx
+#length : This will be calculated from bin by bin
+#GC : do we need this normalization or not if we have GC as a feature?
+
+mapped_read <- 1881542 ##This parameter need to be changed for each samples
+
+
+setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_SCDE')
+CNN_features_annot <- read.table("bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_mononuc <- read.table("Features_reshape_BCLL01_C3_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_CpG <- read.table("Features_reshape_CpG_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_GC <- read.table("Features_reshape_GC_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_size <- read.table("Features_reshape_size_orientation.txt", header=F, sep ='\t', comment.char = "")  
+TSS_matrix <- read.table("Strand_seq_matrix_TSS_for_SVM.txt", header=TRUE, sep ='\t')
+
+setwd('/Users/jeong/Documents/Strand_Seq/RNA_seq/htseq_DEanalysis_2019_renamed')
+FPKM <- read.table("FPKM_sort_LCL_RPE_19770_renamed.txt", header=T, sep ='\t', comment.char = "")
+TSS_matrix_woM <- TSS_matrix[TSS_matrix[,2]!="chrM",]
+FPKM_woM <- FPKM[TSS_matrix[,2]!="chrM",]
+
+
+
+##smooth spline fit for the length normalization
+
+table_size_flat <- matrix(0, 1, 1)
+for (i in 1:ncol(table_size)){
+table_size_flat <- rbind(table_size_flat, as.matrix(table_size[,i]))
+}
+table_size_flat <- table_size_flat[-1,]
+
+table_mononuc_flat <- matrix(0, 1, 1)
+for (i in 1:ncol(table_mononuc)){
+table_mononuc_flat <- rbind(table_mononuc_flat, as.matrix(table_mononuc[,i]))
+}
+table_mononuc_flat <- table_mononuc_flat[-1,]
+
+
+
+##Fit smooth spline (length vs. ratio to the mean) , alternative mode (log2 scale)
+Input_norm <- table_mononuc_flat
+Input_norm_sizenorm_mode2 <- matrix(0, length(Input_norm), 1)
+Input_norm_log <- log2(Input_norm+1) #log2 conversion with pseudocount 1
+
+
+	plot(table_size_flat, (Input_norm_log-(mean(Input_norm_log))), xlab="size (bp)", ylab="log2(RPM/mean)")
+	fit1<-smooth.spline(table_size_flat, (Input_norm_log-(mean(Input_norm_log))), df=16)
+	lines(fit1,col="red",lwd=2)
+
+	Input_norm_log_sub<-Input_norm_log
+	Input_size_sub<-table_size_flat
+	ratio_norm_log<-matrix(0, length(Input_norm_log_sub),1)
+	a<-predict(fit1, Input_size_sub)
+	ratio_norm_log[,1] <- Input_norm_log_sub-mean(Input_norm_log)-a$y
+	Input_norm_sizenorm_mode2[,1] <- ratio_norm_log[,1] + mean(Input_norm_log)
+
+	plot(table_size_flat, ratio_norm_log, main="size normalized", xlab="size (bp)", ylab="log2(RPM/mean)")
+	fit1_norm<-smooth.spline(table_size_flat, ratio_norm_log,df=16)
+	lines(fit1_norm,col="red",lwd=2)
+
+library(pracma)
+table_mononuc_norm_length <- Reshape(2^Input_norm_sizenorm_mode2-1, (19770-13), 150)
+table_mononuc_norm <- table_mononuc
+
+
+##plotting script
+##library size normalization to calculate RPM (read per million mapped read)
+
+table_mononuc_norm <- table_mononuc_norm_length
+plot(c(1:150), colMeans(table_mononuc_norm), type="o")
+plot(c(1:150), colMeans(table_mononuc_norm*1000000/mapped_read), type="o")
+table_mononuc_norm2 <- table_mononuc_norm*1000000/mapped_read
+
+data_exp <- rowMeans(FPKM_woM[,1:9]) ##This parameter need to be changed for each samples
+avg_multi <- matrix(0, 5, 150)
+avg_multi[1,] <-colMeans(table_mononuc_norm2[data_exp==0,])
+avg_multi[2,] <-colMeans(table_mononuc_norm2[data_exp>0 & data_exp<0.1,])
+avg_multi[3,] <-colMeans(table_mononuc_norm2[data_exp>0.1 & data_exp<=1,])
+avg_multi[4,] <-colMeans(table_mononuc_norm2[data_exp>1 & data_exp<=3,])
+avg_multi[5,] <-colMeans(table_mononuc_norm2[data_exp>3,])
+
+position <- 1:150
+
+plot(position, avg_multi[1,], type="o",col='gray', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[2,], type="o",col='blue', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[3,], type="o",col='green', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[4,], type="o",col='orange', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+par(new=T)
+plot(position, avg_multi[5,], type="o",col='red', cex=0.1,lwd=3, ylim=range(avg_multi), xlab='genebody', ylab='Read count per million mapped read', main='BCLL01_C3')
+
+
+
+##save the normalized result
+setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_SCDE')
+write.table(table_mononuc_norm2, "Features_reshape_BCLL01_C3_orientation_norm.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+
