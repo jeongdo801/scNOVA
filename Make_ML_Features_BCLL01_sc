@@ -1,0 +1,1230 @@
+#----------------------------------------------------------------------------------------------------------------
+#Extract single-cell copy-number variation based on MosaiCatcher result for normalization purpose
+#----------------------------------------------------------------------------------------------------------------
+setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_ATAC')
+TSS_matrix <- read.table("Strand_seq_matrix_TSS_for_SVM.txt", header=TRUE, sep ='\t')
+TES_matrix <- read.table("Strand_seq_matrix_TES_for_SVM.txt", header=TRUE, sep ='\t')
+NDR_matrix <- read.table("Strand_seq_matrix_NDR_for_SVM.txt", header=TRUE, sep ='\t')
+Genebody_matrix <- read.table("Strand_seq_matrix_Genebody_for_SVM.txt", header=TRUE, sep ='\t')
+DHS_matrix <- read.table("Strand_seq_matrix_ATAC_BM_Thy.txt", header=TRUE, sep ='\t')
+bin1Mb_matrix <- read.table("Strand_seq_matrix_bin_1Mb.txt", header=TRUE, sep ='\t')
+
+sv_calls <- read.table("/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_ATAC/Active_X_haplo_analysis/RPE1_ADCR11/mosaicatcher_result_RPE1_celllines/ADCR11_Karen/ADCR11.lenient.combined.txt", sep = '\t', header=T)
+sv_calls$CN <- matrix(2, nrow(sv_calls), 1)
+sv_calls$CN[sv_calls$sv_call_name=="del_h1",1] <- 1
+sv_calls$CN[sv_calls$sv_call_name=="del_h2",1] <- 1
+sv_calls$CN[sv_calls$sv_call_name=="del_hom",1] <- 0
+sv_calls$CN[sv_calls$sv_call_name=="dup_h1",1] <- 3
+sv_calls$CN[sv_calls$sv_call_name=="dup_h2",1] <- 3
+sv_calls$CN[sv_calls$sv_call_name=="dup_hom",1] <- 4
+sv_calls$CN[sv_calls$sv_call_name=="idup_h1",1] <- 3
+sv_calls$CN[sv_calls$sv_call_name=="idup_h2",1] <- 3
+
+data1 <- sv_calls
+data1$color <- 0
+ash12rainbow <- c("#77AADD", "#77AADD", "#114477", "#CC99BB", "#CC99BB", "#771155", "#DDDD77", "#DDDD77", "#777711", "#DDAA77", "#DDAA77", "#774411")#, "#C1FFC1")
+sv_call_name <- c("del_h1",  "del_h2",  "del_hom", "dup_h1",  "dup_h2",  "dup_hom", "inv_h1",  "inv_h2",  "inv_hom", "idup_h1", "idup_h2", "complex")#, "imputed")
+for (j in 1:length(sv_call_name)){
+tmp <- which(data1[,9]==sv_call_name[j])
+data1[tmp,15] <- j
+}
+
+data1_pos <- data1[,1:3]
+data1_pos_uniq <- unique(data1_pos)
+data1_pos_uniq_sort <- data1_pos_uniq[data1_pos_uniq$chrom=="chr1",]
+chrom <- c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX")
+
+for (i in 2:length(chrom)){
+data1_pos_uniq_sort<-rbind(data1_pos_uniq_sort, data1_pos_uniq[data1_pos_uniq$chrom==chrom[i],])
+}
+data1_pos_uniq_sort$posind <- c(1:nrow(data1_pos_uniq_sort))
+
+data1_cell <- data1[,5]
+data1_cell_uniq <- unique(data1_cell)
+data1_cell_uniq_sort <- as.matrix(sort(data1_cell_uniq))
+
+result <- matrix(0, nrow(data1_cell_uniq_sort), nrow(data1_pos_uniq))
+result_sv <- matrix(0, nrow(data1_cell_uniq_sort), nrow(data1_pos_uniq))
+result_cn <- matrix(2, nrow(data1_cell_uniq_sort), nrow(data1_pos_uniq))
+
+for (i in 1:nrow(data1)){
+pos_ind <- which(data1_pos_uniq_sort[,1]==data1[i,1] & data1_pos_uniq_sort[,2]==data1[i,2] & data1_pos_uniq_sort[,3]==data1[i,3])
+cell_ind <- which(data1_cell_uniq_sort[,1]==data1[i,5])
+result[cell_ind, pos_ind] <- data1[i,13]
+result_sv[cell_ind, pos_ind] <- data1[i,15]
+result_cn[cell_ind, pos_ind] <- data1[i,17]
+}
+rownames(result) <- data1_cell_uniq_sort
+colnames(result) <- data1_pos_uniq_sort$posind
+result[result==Inf] <- max(result[result!=Inf])
+rownames(result_sv) <- data1_cell_uniq_sort
+colnames(result_sv) <- data1_pos_uniq_sort$posind
+rownames(result_cn) <- data1_cell_uniq_sort
+colnames(result_cn) <- data1_pos_uniq_sort$posind
+
+##Imputation
+imput_cand <- matrix(0, 1, 3)
+for (i in 1:length(chrom)){
+  tmp <- result_sv[,data1_pos_uniq_sort[,1]==chrom[i]]
+  if (sum(data1_pos_uniq_sort[,1]==chrom[i])>1){
+  tmp_cor <- cor(tmp, tmp, method="spearman")
+  tmp_cor_pos <- tmp_cor>0.7
+  tmp_cor_pos_min_max <- matrix(0, ncol(tmp), 2)
+  for (j in 1:ncol(tmp)){
+    tmp_cor_pos_min_max[j,1] <- min(which(tmp_cor_pos[,j]==1))
+    tmp_cor_pos_min_max[j,2] <- max(which(tmp_cor_pos[,j]==1))
+  }
+    if (sum((tmp_cor_pos_min_max[,2]-tmp_cor_pos_min_max[,1])>0)>0){
+      cand <- tmp_cor_pos_min_max[min(which((tmp_cor_pos_min_max[,2]-tmp_cor_pos_min_max[,1])>0)),]
+      if ((sum(tmp[,cand[1]]==tmp[,cand[2]])/nrow(tmp))>0.8){cat(paste0(chrom[i], ' ', cand[1], ' ', cand[2], ' '))
+        imput_cand <- rbind(imput_cand, c(i, cand[1], cand[2]))}
+    }
+  }
+}
+imput_cand <- imput_cand[-1,]
+#if (class(imput_cand)!="matrix"){imput_cand <- t(as.matrix(imput_cand))}
+
+#sv_call_name <- c("del_h1",  "del_h2",  "del_hom", "dup_h1",  "dup_h2",  "dup_hom", "inv_h1",  "inv_h2",  "inv_hom", "idup_h1", "idup_h2", "complex")#, "imputed")
+result_sv[result_sv==2] <- 1 #del_het (CN==1)
+result_sv[result_sv==5] <- 4 #dup_het (CN==3)
+result_sv[result_sv==10] <- 4 #idup_het (CN==3)
+result_sv[result_sv==11] <- 4 #idup_het (CN==3)
+#result_sv[result_sv==11] <- 10 #idup_het (CN==3)
+
+data1_pos_uniq_sort$CN <- 2
+for (i in 1:nrow(data1_pos_uniq_sort)){
+  #if ((sum(result_sv[,i]==1)/nrow(result_sv))>0.8){data1_pos_uniq_sort[i,5] <- 1}
+  #if ((sum(result_sv[,i]==3)/nrow(result_sv))>0.8){data1_pos_uniq_sort[i,5] <- 0}
+  #if ((sum(result_sv[,i]==4)/nrow(result_sv))>0.8){data1_pos_uniq_sort[i,5] <- 3}
+  #if ((sum(result_sv[,i]==6)/nrow(result_sv))>0.8){data1_pos_uniq_sort[i,5] <- 4}
+  #if ((sum(result_sv[,i]==10)/nrow(result_sv))>0.8){data1_pos_uniq_sort[i,5] <- 3}
+  
+  #Calculate allele frequency without complex genotype cells
+  if ((sum(result_sv[,i]!=12 & result_cn[,i]==0)/sum(result_sv[,21]!=12))>0.8){data1_pos_uniq_sort[i,5] <- 0}
+  if ((sum(result_sv[,i]!=12 & result_cn[,i]==1)/sum(result_sv[,21]!=12))>0.8){data1_pos_uniq_sort[i,5] <- 1}
+  if ((sum(result_sv[,i]!=12 & result_cn[,i]==3)/sum(result_sv[,21]!=12))>0.8){data1_pos_uniq_sort[i,5] <- 3}
+  if ((sum(result_sv[,i]!=12 & result_cn[,i]==4)/sum(result_sv[,21]!=12))>0.8){data1_pos_uniq_sort[i,5] <- 4}
+}
+
+data1_pos_uniq_sort_imput <- as.data.frame(matrix(0, 1, 5))
+colnames(data1_pos_uniq_sort_imput) <- colnames(data1_pos_uniq_sort)
+for (i in 1:length(chrom)){
+  if (sum(imput_cand[,1]==i)==0){data1_pos_uniq_sort_imput <- rbind(data1_pos_uniq_sort_imput, data1_pos_uniq_sort[data1_pos_uniq_sort[,1]==chrom[i],])}
+  if (sum(imput_cand[,1]==i)>0){
+    tmp <- data1_pos_uniq_sort[data1_pos_uniq_sort[,1]==chrom[i],]
+    tmp_imput <- imput_cand[imput_cand[,1]==i,]
+    for (j in 1:nrow(tmp)){
+      if(j<tmp_imput[2] | j>tmp_imput[3]){data1_pos_uniq_sort_imput <- rbind(data1_pos_uniq_sort_imput, tmp[j,])}
+      if(j==tmp_imput[2]){
+        tmp_imput_data <- tmp[tmp_imput[2]:tmp_imput[3],]
+        tmp_imput_line <- as.data.frame(cbind(as.character(tmp_imput_data[1,1]), min(tmp_imput_data[,2]), max(tmp_imput_data[,3]), min(tmp_imput_data[,4]), max(tmp_imput_data[,5])))
+        colnames(tmp_imput_line) <- colnames(data1_pos_uniq_sort)
+        data1_pos_uniq_sort_imput <- rbind(data1_pos_uniq_sort_imput, tmp_imput_line)
+      }
+    }
+  }
+}
+data1_pos_uniq_sort_imput <- data1_pos_uniq_sort_imput[-1,]
+data1_pos_uniq_sort_imput[,2] <- as.integer(data1_pos_uniq_sort_imput[,2])
+data1_pos_uniq_sort_imput[,3] <- as.integer(data1_pos_uniq_sort_imput[,3])
+data1_pos_uniq_sort_imput[,4] <- as.numeric(data1_pos_uniq_sort_imput[,4])
+data1_pos_uniq_sort_imput[,5] <- as.numeric(data1_pos_uniq_sort_imput[,5])
+
+#data1_pos_uniq_sort_imput_manual <- data1_pos_uniq_sort_imput
+#data1_pos_uniq_sort_imput_manual[data1_pos_uniq_sort_imput[,5]==0,5] <- 2
+#data1_pos_uniq_sort_imput <- data1_pos_uniq_sort_imput_manual
+
+
+
+
+
+##5) CN for CNN Calculate average copy-number for 150 bins of 19770 genes
+Deeptool_result_final <- read.table("/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_ATAC/Deeptool_Genes_for_CNN_merge_sort_lab_final.txt", header=TRUE, sep ='\t', comment.char = "")
+CNN_matrix <- Deeptool_result_final[,1:4]
+CN_matrix_CNN <- matrix(2, nrow(CNN_matrix), 1) #save copy number for DHS (if there's no SV calls, default CN = 2)
+for (i in 1:nrow(CNN_matrix)){
+  tmp <- data1_pos_uniq_sort_imput[data1_pos_uniq_sort_imput[,1]==as.character(CNN_matrix[i,1]),] ##Extract clonal SVs
+  CN_CNN <- rbind(tmp[tmp[,2]>CNN_matrix[i,2] & tmp[,3]<CNN_matrix[i,3],],
+  tmp[tmp[,2]<CNN_matrix[i,2] & tmp[,3]>CNN_matrix[i,2],],
+  tmp[tmp[,2]<CNN_matrix[i,3] & tmp[,3]>CNN_matrix[i,3],])
+  if (nrow(CN_CNN)>0){
+    CN_matrix_CNN[i,1] <- mean(CN_CNN[,5])
+  }
+  
+  cat(paste0(i, ' '))
+}
+colnames(CN_matrix_CNN) <- "CN_CNN"
+
+
+library(pracma)
+CN_matrix_CNN_reshape <- t(Reshape(CN_matrix_CNN, 150, (19770-13)))
+
+CNN_features_annot <- read.table("bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_original <- CN_matrix_CNN_reshape
+table_final <- as.data.frame(matrix(0, nrow(table_original), ncol(table_original)))
+for (i in 1:nrow(table_original)){
+	if (CNN_features_annot[i,6]=="+"){table_final[i,] <- table_original[i,]}
+	if (CNN_features_annot[i,6]=="-"){
+		tmp <- table_original[i,c(150:1)]
+		colnames(tmp) <- colnames(table_original)
+		table_final[i,] <- tmp
+		}
+	cat(paste0(i, ' '))
+}
+#write.table(table_final, "Features_reshape_RPE1_ADCR11_tit_PE20402_orientation_CN.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+#write.table(data1_pos_uniq_sort, "data1_pos_uniq_sort_BCLL01_C0.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+#write.table(data1_pos_uniq_sort_imput, "data1_pos_uniq_sort_imput_BCLL01_C0.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Sort deeptool result by coordinate and then cbind peak number and then sort by peak number and then reshape into (19770*150) chrM 13 genes excluded : BCLL01
+#----------------------------------------------------------------------------------------------------------------
+
+-bash-4.2$ sort -k1,1 -k2,2n -k3,3n -t$'\t' Deeptool_Genes_for_CNN_BCLL01_C0.tab > Deeptool_Genes_for_CNN_BCLL01_C0_sort.txt
+
+Deeptool_result <- read.table("Deeptool_Genes_for_CNN_BCLL01_C0_sort.txt", header=TRUE, sep ='\t', comment.char = "")
+Deeptool_result_new <- Deeptool_result[,4:ncol(Deeptool_result)]
+Ref_bed <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_num_sort.txt", header=F, sep ='\t', comment.char = "")
+
+Deeptool_result_woM <- Deeptool_result[Deeptool_result[,1]!="chrM",]
+Deeptool_result_new_woM <- Deeptool_result_new[Deeptool_result[,1]!="chrM",]
+Ref_bed_woM <- Ref_bed[Ref_bed[,1]!="chrM",]
+
+
+Deeptool_result_lab <- cbind(Deeptool_result_woM[,1:3], Ref_bed_woM[,4], Deeptool_result_new_woM)
+write.table(Deeptool_result_lab, "Deeptool_Genes_for_CNN_BCLL01_C0_sort_lab.txt", row.names = FALSE, col.names = TRUE, sep="\t", quote = FALSE)
+
+-bash-4.2$ sort -k4,4n -t$'\t' Deeptool_Genes_for_CNN_BCLL01_C0_sort_lab.txt > Deeptool_Genes_for_CNN_BCLL01_C0_sort_lab_final.txt
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Single-cell Feature generation
+#----------------------------------------------------------------------------------------------------------------
+Deeptool_result_final <- read.table("Deeptool_Genes_for_CNN_BCLL01_C0_sort_lab_final.txt", header=TRUE, sep ='\t', comment.char = "")
+CNN_features_annot <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/bin_Genes_for_CNN_reshape_annot.txt", header=T, sep ='\t', comment.char = "")
+table_CpG <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_CpG_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_GC <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_GC_orientation.txt", header=F, sep ='\t', comment.char = "")
+table_size <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_size_orientation.txt", header=F, sep ='\t', comment.char = "")  
+TSS_matrix <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Strand_seq_matrix_TSS_for_SVM.txt", header=TRUE, sep ='\t')
+Deeptool_mapped <- read.table("Deeptool_chr_length_BCLL01_C0.tab", header=TRUE, sep ='\t', comment.char = "")
+
+
+> files
+ [1] ".//Features_reshape_BCLL01_PE20402_orientation_norm.txt"
+ [2] ".//Features_reshape_BCLL01_PE20404_orientation_norm.txt"
+ [3] ".//Features_reshape_BCLL01_PE20410_orientation_norm.txt"
+ [4] ".//Features_reshape_BCLL01_PE20413_orientation_norm.txt"
+ [5] ".//Features_reshape_BCLL01_PE20416_orientation_norm.txt"
+ [6] ".//Features_reshape_BCLL01_PE20421_orientation_norm.txt"
+ [7] ".//Features_reshape_BCLL01_PE20423_orientation_norm.txt"
+ [8] ".//Features_reshape_BCLL01_PE20424_orientation_norm.txt"
+ [9] ".//Features_reshape_BCLL01_PE20425_orientation_norm.txt"
+[10] ".//Features_reshape_BCLL01_PE20429_orientation_norm.txt"
+[11] ".//Features_reshape_BCLL01_PE20431_orientation_norm.txt"
+[12] ".//Features_reshape_BCLL01_PE20432_orientation_norm.txt"
+[13] ".//Features_reshape_BCLL01_PE20436_orientation_norm.txt"
+[14] ".//Features_reshape_BCLL01_PE20444_orientation_norm.txt"
+[15] ".//Features_reshape_BCLL01_PE20452_orientation_norm.txt"
+[16] ".//Features_reshape_BCLL01_PE20456_orientation_norm.txt"
+[17] ".//Features_reshape_BCLL01_PE20457_orientation_norm.txt"
+[18] ".//Features_reshape_BCLL01_PE20458_orientation_norm.txt"
+[19] ".//Features_reshape_BCLL01_PE20463_orientation_norm.txt"
+[20] ".//Features_reshape_BCLL01_PE20467_orientation_norm.txt"
+[21] ".//Features_reshape_BCLL01_PE20469_orientation_norm.txt"
+[22] ".//Features_reshape_BCLL01_PE20471_orientation_norm.txt"
+[23] ".//Features_reshape_BCLL01_PE20476_orientation_norm.txt"
+[24] ".//Features_reshape_BCLL01_PE20478_orientation_norm.txt"
+[25] ".//Features_reshape_BCLL01_PE20487_orientation_norm.txt"
+[26] ".//Features_reshape_BCLL01_PE20488_orientation_norm.txt"
+
+
+#----------------------------------------------------------------------------------------------------------------
+##This script is to exclude variation feature for the single-cell prediction study
+#----------------------------------------------------------------------------------------------------------------
+
+##-------------------------------------------------------------------------------------
+##Features: Benchmarking : Nucleosome occupancy (mono) 2K around TSS, NDR (-150 to 50bp)
+##-------------------------------------------------------------------------------------
+TSS_matrix <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Strand_seq_matrix_TSS_for_SVM.txt", header=TRUE, sep ='\t')
+NDR_matrix <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Strand_seq_matrix_NDR_for_SCDE.txt", header=TRUE, sep ='\t')
+
+##-------------------------------------------------------------------------------------
+##Features: Sequence : GC%, CpG%, RT
+##-------------------------------------------------------------------------------------
+table_GC_imput <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_GC_orientation_impute.txt", header=F, sep ='\t', comment.char = "")
+table_CpG_imput <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_CpG_orientation_impute.txt", header=F, sep ='\t', comment.char = "")
+table_RT <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_RT_orientation.txt", header=F, sep ='\t', comment.char = "")
+
+##-------------------------------------------------------------------------------------
+##Features: Nucleosome occupancy 150 bins and copy-number normalization
+##-------------------------------------------------------------------------------------
+
+files <- list.files("./", pattern="_norm.txt$", full.names=TRUE)
+
+for (k in 1:length(files)){
+  filename <- strsplit(files[k], './/Features_reshape_')[[1]][2]
+  filename <- strsplit(filename, '_orientation_norm.txt')[[1]][1]
+  table_mononuc_norm_data1 <- read.table(files[k], header=F, sep ='\t', comment.char = "")
+  
+  ##Normalization by copy number (19757 X 150 copy number matrix)
+  CN_result_data1 <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_BCLL01_C1_orientation_CN_correct0.txt", sep = '\t', header=F)
+  CN_result_data2 <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_BCLL01_C3_orientation_CN_correct0.txt", sep = '\t', header=F) ##BCLL01_PE20423 (k=7), BCLL01_PE20456 (k=16)
+  CN_result_data3 <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_BCLL01_C4_orientation_CN_correct0.txt", sep = '\t', header=F) ##BCLL01_PE20467 (k=20)
+
+  table_mononuc_norm_data1_cn <- table_mononuc_norm_data1/CN_result_data1
+	#table_mononuc_norm_data1_cn <- table_mononuc_norm_data1/CN_result_data2
+	#table_mononuc_norm_data1_cn <- table_mononuc_norm_data1/CN_result_data3
+	
+  ##-------------------------------------------------------------------------------------
+  ##Features: Nucleosome occupancy Residual of the CV square 150 bins
+  ##-------------------------------------------------------------------------------------
+  #table_mononuc_var_data1 <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/Features_reshape_RPE1_WT_Resid_orientation.txt", header=F, sep ='\t', comment.char = "")
+
+  FPKM <- read.table("/g/korbel2/StrandSeq/Test_HJ/reference/FPKM_sort_LCL_RPE_19770_renamed.txt", header=T, sep ='\t', comment.char = "")
+  TSS_matrix_woM <- TSS_matrix[TSS_matrix[,2]!="chrM",]
+  FPKM_woM <- FPKM[TSS_matrix[,2]!="chrM",]
+  FPKM_woM_RPE1 <- cbind(as.matrix(rowMeans(FPKM_woM[,1:9])), as.matrix(rowMeans(FPKM_woM[,1:9])), as.matrix(rowMeans(FPKM_woM[,1:9])), as.matrix(rowMeans(FPKM_woM[,1:9])), as.matrix(rowMeans(FPKM_woM[,1:9])))
+  Expression_label <- matrix(0, nrow(FPKM_woM_RPE1), 5)
+  for (i in 1:5){
+    Expression_label[FPKM_woM_RPE1[,i]>1,i] <- 1
+  }
+
+
+  Features_label <- as.matrix(Expression_label[,1])#For BCLL01, use mean of LCL
+  TSS_matrix_woM_all <- TSS_matrix_woM
+  table_RT_all <- table_RT
+  #for (i in 1:4){
+  #  Features_label <- rbind(Features_label,as.matrix(Expression_label[,(i+1)]))
+  #  TSS_matrix_woM_all <- rbind(TSS_matrix_woM_all, TSS_matrix_woM)
+  #  table_RT_all <- rbind(table_RT_all, as.matrix(table_RT))
+  #}
+
+
+  ##Alternative way to make input format for the transposed features (150X4)
+  Features_t1 <- cbind(table_mononuc_norm_data1_cn[,1], table_GC_imput[,1], table_CpG_imput[,1], table_RT[,1]/100)
+  for (i in 2:150){
+    Features_t1 <- cbind(Features_t1, cbind(table_mononuc_norm_data1_cn[,i], table_GC_imput[,i], table_CpG_imput[,i], table_RT[,i]/100))
+  }
+  Features_tall <- rbind(Features_t1)
+  Features_both_sub <- Features_tall
+
+
+  standard_svm <- data.frame(Features_both_sub)
+  standard_svm$Type<-rep(0, nrow(standard_svm))
+  standard_svm[Features_label=="0",ncol(Features_both_sub)+1] <- 0
+  standard_svm[Features_label=="1",ncol(Features_both_sub)+1] <- 1
+  standard_svm$Type <- as.factor(standard_svm$Type)
+
+  standard_svm_RT <- standard_svm[is.na(rowSums(table_RT_all))==0,]
+  TSS_matrix_woM_all_RT <- TSS_matrix_woM_all[is.na(rowSums(table_RT_all))==0,]
+  
+  #standard_svm_RT_union <- rbind(standard_svm_RT_union, standard_svm_RT)
+  #TSS_matrix_woM_all_RT_union <- rbind(TSS_matrix_woM_all_RT_union, TSS_matrix_woM_all_RT)
+  
+  write.table(standard_svm_RT[,1:601], paste0("Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_", filename, "_wovar_exp.txt"), row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+  cat(paste0(k, ' '))
+}
+
+
+#write.table(TSS_matrix_woM_all_RT, "/g/korbel2/StrandSeq/Test_HJ/reference/TSS_matrix_woM_all_RT_BCLL01_C4_example.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+write.table(standard_svm_RT[,601], "Expression_all_BCLL01_sc.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+write.table(TSS_matrix_woM_all_RT[,c(2:5, 60:61)], "Features_reshape_all_TSS_matrix_woM_all_BCLL01_sc.txt", row.names = FALSE, col.names = FALSE, sep="\t", quote = FALSE)
+
+cat *wovar_exp.txt > BCLL01_wovar_exp.txt
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+#Prediction of one cell with Chr10q small del
+#----------------------------------------------------------------------------------------------------------------
+Nucleosome_data_new = pd.read_csv("Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_BCLL01_PE20467_wovar_exp.txt", delimiter='\t', header=None)
+Expression_label_new = pd.read_csv("Expression_all_BCLL01_sc.txt", delimiter='\t', header=None)
+TSS_matrix_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_BCLL01_sc.txt", delimiter='\t', header=None)
+
+
+#img_rows, img_cols = 3, 150
+img_rows_new, img_cols_new = 150, 4
+num_classes_new = 2
+num_images_new = Nucleosome_data_new.shape[0]
+
+x_as_array_new = Nucleosome_data_new.values[:,:]
+x_shaped_array_new = x_as_array_new.reshape(num_images_new, img_rows_new, img_cols_new)
+x_new = x_shaped_array_new
+y_new = keras.utils.to_categorical(Expression_label_new, num_classes_new)
+test_chr_new = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX']
+
+print(Nucleosome_data_new.shape)
+print(Expression_label_new.shape)
+
+
+
+
+##1) Start the model
+from tensorflow import keras
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Conv1D, BatchNormalization, MaxPooling1D, GlobalMaxPooling1D, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
+from sklearn.metrics import roc_curve
+import matplotlib.pyplot as plt
+from sklearn.metrics import auc
+test_chr_new = ['chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX']
+
+
+auc_all_dim = (23, 1)
+auc_all = np.zeros(auc_all_dim)
+j = 0
+
+for i in test_chr_new:
+    print(i)
+    x_train = x[(TSS_matrix[0]!=i) & (TSS_matrix[0]!="chrY"),:]
+    y_train = y[(TSS_matrix[0]!=i) & (TSS_matrix[0]!="chrY"),:]
+    x_test = x_new[TSS_matrix_new[0]==i,:]
+    y_test = Expression_label_new[TSS_matrix_new[0]==i]
+    #x_test = x[(TSS_matrix[0]==i) & (TSS_matrix[4]==1),:]
+    #y_test = Expression_label[(TSS_matrix[0]==i) & (TSS_matrix[4]==1)] 
+    
+    
+    
+#----------------------------------------------------------------------------------------------------------------
+#Prediction of 26 cells
+#----------------------------------------------------------------------------------------------------------------    
+import numpy as np
+import pandas as pd
+from tensorflow import keras
+    
+Nucleosome_data_BCLL01 = pd.read_csv("/g/korbel2/StrandSeq/Test_HJ/Files_ASE/Features_BCLL01/BCLL01_wovar_exp.txt", delimiter='\t', header=None)
+Nucleosome_data_new = Nucleosome_data_BCLL01
+
+nuc_as_array_new = Nucleosome_data_new.values[:,:]
+
+Nucleosome_data_new = nuc_as_array_new[:,0:600]
+Expression_label_new = nuc_as_array_new[:,600]
+print(Nucleosome_data_new.shape)
+print(Expression_label_new.shape)
+
+del nuc_as_array_new
+
+TSS_matrix_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+TSS_matrix2_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+
+for i in range(25):
+    TSS_matrix_new = TSS_matrix_new.append(TSS_matrix2_new)
+    print(i)
+print(TSS_matrix_new.shape)
+
+#img_rows, img_cols = 3, 150
+img_rows, img_cols = 150, 4
+num_classes = 2
+num_images = Nucleosome_data_new.shape[0]
+
+#x_as_array = Nucleosome_data.values[:,:]
+x_shaped_array_new = Nucleosome_data_new.reshape(num_images, img_rows, img_cols)
+x_new = x_shaped_array_new
+y_new = keras.utils.to_categorical(Expression_label_new, num_classes)
+
+
+
+#----------------------------------------------------------------------------------------------------------------
+#20200427 Extract Prediction result of 26 cells (python), extract TSS_matrix
+#----------------------------------------------------------------------------------------------------------------   
+import numpy as np
+import pandas as pd
+
+TSS_matrix_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+TSS_matrix2_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+
+for i in range(25):
+    TSS_matrix_new = TSS_matrix_new.append(TSS_matrix2_new)
+    print(i)
+print(TSS_matrix_new.shape)
+#(508144, 6)
+
+from pandas import DataFrame
+df = DataFrame(TSS_matrix_new)
+df.to_csv(r"Features_reshape_all_TSS_matrix_woM_all_RT_BCLL01_26cells.txt", sep='\t', index=False, header=False)
+
+#----------------------------------------------------------------------------------------------------------------
+#20200427 Extract Prediction result of 26 cells (R)
+#---------------------------------------------------------------------------------------------------------------- 
+files <- list.files("./", pattern="_norm.txt$", full.names=TRUE)
+filename <- files
+for (i in 1:length(files)){
+	filename[i]<-strsplit(files[i], './/Features_reshape_')[[1]][2]
+	filename[i]<-strsplit(filename[i], '_orientation_norm.txt')[[1]][1]
+}
+
+
+TSS_matrix <- read.table("Features_reshape_all_TSS_matrix_woM_all_RT_BCLL01_26cells.txt", header=F, sep ='\t', comment.char = "")
+TSS_matrix$Sample <- "BCLL01"
+for (i in 1:length(files)){
+	for (j in 1:(nrow(TSS_matrix)/length(files))){
+		TSS_matrix[(i-1)*(nrow(TSS_matrix)/length(files))+j,7] <- filename[i]
+	}
+	cat(paste0(i, ' '))
+}
+
+chromosome <- c('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX')
+
+Pred_all <- data.frame(matrix(vector(), 0, 9, dimnames=list(c(), c("chr", "start", "end", "GeneID", "a", "b", "Sample", "Unexpressed", "Expressed"))), stringsAsFactors=F)
+for (i in 1:length(chromosome)){
+	Pred_file <- paste0('RPE1_WT_BM510_C7_test_BCLL01_ypred_sc_', chromosome[i], '.csv')
+	Pred_result <- read.table(Pred_file, header=F, sep =' ', comment.char = "")
+	TSS_matrix_chr <- TSS_matrix[TSS_matrix[,1] == chromosome[i],]
+	Pred_all <- rbind(Pred_all, cbind(TSS_matrix_chr, Pred_result))
+}
+
+colnames(Pred_all) <- c("chr", "start", "end", "GeneID", "a", "b", "Sample", "Unexpressed", "Expressed")
+
+#Pred_cell <- Pred_all[Pred_all$Sample == "BCLL01_PE20467",]
+#write.table(Pred_cell, "Pred_cell_BCLL01_PE20467.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+
+Pred_cell_all <- data.frame(matrix(vector(), 19544, 0))
+for (i in 1:length(files)){
+	Pred_cell <- Pred_all[Pred_all$Sample == filename[i],]
+	Pred_cell_output <- paste0("Pred_cell_", filename[i], ".txt")
+	write.table(Pred_cell, Pred_cell_output, row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+	Pred_cell_all <- cbind(Pred_cell_all, Pred_cell)
+}
+write.table(Pred_cell_all, "Pred_cell_BCLL01_all.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+
+
+
+
+
+
+-------------------------------------------------------------------------------------
+%%20200518 Normcount of CLL
+-------------------------------------------------------------------------------------
+
+
+
+## 1. Preprocessing
+
+CM <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount.txt", sep = '\t', header=T, comment.char = "")
+CM_name <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_genename.txt", sep = '\t', header=F, comment.char = "")
+rownames(CM) <- as.matrix(CM_name)
+
+
+
+### plot read numbers per sample:
+barplot(colSums(CM), col="sienna", las=2, cex.names =0.6, cex.axis=0.6, ylab = "library size")
+mtext(side=2, line=4.5, text="Number of transcript-counted reads", font=2)
+
+
+
+
+## Make condition column for the sample information
+cts <- CM
+coldata <- as.data.frame(matrix("CLL", ncol(CM), 1))
+
+rownames(coldata) <- colnames(cts)
+colnames(coldata) <- "condition"
+
+
+## To extract normalized read count
+library("DESeq2")
+dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design = ~ 1)
+#keep <- rowSums(counts(dds)) >= 10
+#dds <- dds[keep,]
+dds <- DESeq(dds)
+normcount <- counts(dds, normalized=TRUE)
+#write.table(normcount, file = "/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_ATAC/Active_X_haplo_analysis/K562_Tania/DESeq_normcount_K562.txt", sep="\t", col.names = TRUE, row.names = TRUE, quote = FALSE)
+
+normlog <- log2(normcount+1)
+normlog_scale <- matrix(0, nrow(normlog), ncol(normlog))
+for (i in 1:nrow(normlog)){
+	normlog_scale[i,] <- (normlog[i,]-mean(normlog[i,]))/sd(normlog[i,])
+}
+
+
+## 2. Load gene sets
+
+geneset <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_TFtarget.txt", sep = '\t', header=T, comment.char = "")
+normlog_scale_sub <- normlog_scale[geneset[,1]==1,]
+normlog_sub <- normlog[geneset[,1]==1,]
+boxplot(normlog_scale_sub[rowMedians(normlog_sub)>0,31], rowMedians(normlog_scale_sub[rowMedians(normlog_sub)>0,setdiff(1:ncol(CM), 31)]))
+boxplot(normlog_scale_sub[rowMedians(normlog_sub)>0,31], rowMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,setdiff(1:ncol(CM), 31)]))
+barplot(sort(as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,])), decreasing=T), ylab='mean of Z-score', main='Union of CTNNB1/LEF1/TCF targets')
+
+
+
+normlog_scale_sub <- normlog_scale[geneset[,2]==1,]
+normlog_sub <- normlog[geneset[,2]==1,]
+barplot(sort(as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,])), decreasing=T), ylab='mean of Z-score', main='Union of CTNNB1 targets')
+as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,]))
+
+normlog_scale_sub <- normlog_scale[geneset[,3]==1,]
+normlog_sub <- normlog[geneset[,3]==1,]
+barplot(sort(as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,])), decreasing=T), ylab='mean of Z-score', main='Union of LEF1 targets')
+as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,]))
+
+normlog_scale_sub <- normlog_scale[geneset[,5]==1,]
+normlog_sub <- normlog[geneset[,5]==1,]
+barplot(sort(as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,])), decreasing=T), ylab='mean of Z-score', main='Union of TCF targets')
+as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,]))
+
+
+
+
+-------------------------------------------------------------------------------------
+%%20200519 ## Extract read count from normal B cell
+-------------------------------------------------------------------------------------
+
+
+
+## 1. Preprocessing
+
+setwd("/Users/jeong/Documents/Strand_Seq/RNA_seq/htseq_TALL/result_hg38/htseq")
+
+library("xtable")
+library("gplots")
+library("RColorBrewer")
+
+samples <- c(
+"RNA_40_Bcell_Re1.sam_sort.samhtseq_count", 
+"RNA_41_Bcell_Re2.sam_sort.samhtseq_count",
+"RNA_42_Bcell_Re3.sam_sort.samhtseq_count", 
+"RNA_43_Bcell_Re4.sam_sort.samhtseq_count"
+);
+
+
+infiles <- paste(samples, ".out", sep="");
+inlist <- lapply(infiles, read.table);
+alltrans <- unique(unlist(lapply(inlist, "[[", 1), use.names=FALSE));
+
+## construct empty count matrix
+CM <- structure(matrix(as.integer(NA),
+                       nrow=length(alltrans),
+                       ncol=length(samples)),
+                dimnames=list(alltrans, samples))
+
+## fill count matrix
+for (i in 1:length(samples)) {
+  CM[match(inlist[[i]]$V1, rownames(CM)), i] <- inlist[[i]]$V2;
+}
+
+
+## drop non-unique alignments and other non-gene entries
+dropClasses <- c("__alignment_not_unique", "__no_feature", "__ambiguous",
+                 "__too_low_aQual", "__not_aligned")
+
+if (any(dropClasses %in% rownames(CM)))
+  CM <- CM[-match(dropClasses, rownames(CM)),]
+
+#CM <- CM[rowSums(CM)>0L,]
+colnames(CM) <- c(
+"Bcell_Re1", 
+"Bcell_Re2",
+"Bcell_Re3", 
+"Bcell_Re4"
+)
+
+
+### plot read numbers per sample:
+barplot(colSums(CM), col="sienna", las=2, cex.names =0.6, cex.axis=0.6, ylab = "library size")
+mtext(side=2, line=4.5, text="Number of transcript-counted reads", font=2)
+
+
+
+
+## Make condition column for the sample information
+cts <- CM
+coldata <- as.data.frame(c("Bcell","Bcell","Bcell","Bcell"))
+
+rownames(coldata) <- colnames(cts)
+colnames(coldata) <- "condition"
+
+
+## To extract normalized read count
+library("DESeq2")
+dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design = ~ 1)
+#keep <- rowSums(counts(dds)) >= 10
+#dds <- dds[keep,]
+dds <- DESeq(dds)
+normcount <- counts(dds, normalized=TRUE)
+#write.table(normcount, file = "/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/DESeq_normcount_Bcell.txt", sep="\t", col.names = TRUE, row.names = TRUE, quote = FALSE)
+#write.table(CM, file = "/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_Bcell.txt", sep="\t", col.names = TRUE, row.names = TRUE, quote = FALSE)
+
+
+
+-------------------------------------------------------------------------------------
+%%20200519 Comparison of normcount of CLL and Bcell
+-------------------------------------------------------------------------------------
+
+
+
+## 1. Preprocessing
+
+CM <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_CLL_Bcell.txt", sep = '\t', header=T, comment.char = "")
+CM_name <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_CLL_Bcell_genename.txt", sep = '\t', header=F, comment.char = "")
+rownames(CM) <- as.matrix(CM_name)
+
+
+
+### plot read numbers per sample:
+barplot(colSums(CM), col="sienna", las=2, cex.names =0.6, cex.axis=0.6, ylab = "library size")
+mtext(side=2, line=4.5, text="Number of transcript-counted reads", font=2)
+
+
+
+
+## Make condition column for the sample information
+cts <- CM
+coldata <- as.data.frame(rbind(matrix("CLL", 59, 1), matrix("Bcell", 4, 1)))
+
+rownames(coldata) <- colnames(cts)
+colnames(coldata) <- "condition"
+
+
+## To extract normalized read count
+library("DESeq2")
+dds <- DESeqDataSetFromMatrix(countData = cts, colData = coldata, design = ~ condition)
+#keep <- rowSums(counts(dds)) >= 10
+#dds <- dds[keep,]
+dds <- DESeq(dds)
+normcount <- counts(dds, normalized=TRUE)
+#write.table(normcount, file = "/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_ATAC/Active_X_haplo_analysis/K562_Tania/DESeq_normcount_K562.txt", sep="\t", col.names = TRUE, row.names = TRUE, quote = FALSE)
+
+normlog <- log2(normcount+1)
+normlog_scale <- matrix(0, nrow(normlog), ncol(normlog))
+for (i in 1:nrow(normlog)){
+	normlog_scale[i,] <- (normlog[i,]-mean(normlog[i,]))/sd(normlog[i,])
+}
+
+
+## 2. Load gene sets
+
+geneset <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/RNA_rawcount_CLL_Bcell_TFtarget.txt", sep = '\t', header=T, comment.char = "")
+normlog_scale_sub <- normlog_scale[geneset[,1]==1,]
+normlog_sub <- normlog[geneset[,1]==1,]
+boxplot(normlog_scale_sub[rowMedians(normlog_sub)>0,31], rowMedians(normlog_scale_sub[rowMedians(normlog_sub)>0,setdiff(1:ncol(CM), 31)]))
+boxplot(normlog_scale_sub[rowMedians(normlog_sub)>0,31], rowMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,setdiff(1:ncol(CM), 31)]))
+barplot(sort(as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,])), decreasing=T), ylab='mean of Z-score', main='Union of CTNNB1/LEF1/TCF targets')
+
+normlog_scale_mean <- as.matrix(colMeans(normlog_scale_sub[rowMedians(normlog_sub)>0,]))
+normlog_scale_mean2 <- as.data.frame(c(normlog_scale_mean[1:59,1], median(normlog_scale_mean[60:63,1])))
+rownames(normlog_scale_mean2) <- as.matrix(c(colnames(CM[,1:59]), 'Bcell'))
+barplot(normlog_scale_mean2)
+
+
+normlog_scale_mean2 <- as.matrix(normlog_scale_mean2)
+tmp <- rank(as.matrix(normlog_scale_mean2))
+barplot(t(normlog_scale_mean2[order(-tmp),]), las=2)
+write.table(cbind(normlog_scale_mean2, tmp), file = "/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/normlog_scale_mean2_targets.txt", sep="\t", col.names = TRUE, row.names = TRUE, quote = FALSE)
+
+genetic_info <- read.table("/Users/jeong/Documents/Strand_Seq/HSC_analysis/plot_overview_BCLL/metadata/normlog_genetic_info.txt", sep = '\t', header=T, comment.char = "")
+
+
+
+
+> which(CM_name=="ENSG00000105229") ##PIAS4
+[1] 3052
+> which(CM_name=="ENSG00000204435") ##CSNK2B
+[1] 19876
+
+##Bargraph for PIAS4
+normlog_scale_gene <- normlog_scale[3052,]
+normlog_scale_gene2 <- as.matrix(c(normlog_scale_gene[1:59], median(normlog_scale_gene[60:63])))
+rownames(normlog_scale_gene2) <- as.matrix(c(colnames(CM[,1:59]), 'Bcell'))
+tmp <- rank(as.matrix(normlog_scale_gene2))
+barplot(t(normlog_scale_gene2[order(-tmp),]), las=2, main='PIAS4', ylab='Z score')
+
+##Bargraph for CSNK2B
+normlog_scale_gene <- normlog_scale[19876,]
+normlog_scale_gene2 <- as.matrix(c(normlog_scale_gene[1:59], median(normlog_scale_gene[60:63])))
+rownames(normlog_scale_gene2) <- as.matrix(c(colnames(CM[,1:59]), 'Bcell'))
+tmp <- rank(as.matrix(normlog_scale_gene2))
+barplot(t(normlog_scale_gene2[order(-tmp),]), las=2, main='CSNK2B', ylab='Z score')
+
+#----------------------------------------------------------------------------------------------------------------
+#20200522 Extract Prediction result of 26 BCLL01 cells (python), extract TSS_matrix (after CNnorm)
+#----------------------------------------------------------------------------------------------------------------   
+import numpy as np
+import pandas as pd
+
+TSS_matrix_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+TSS_matrix2_new = pd.read_csv("Features_reshape_all_TSS_matrix_woM_all_RPE1_C7_sc.txt", delimiter='\t', header=None)
+
+for i in range(25):
+    TSS_matrix_new = TSS_matrix_new.append(TSS_matrix2_new)
+    print(i)
+print(TSS_matrix_new.shape)
+#(508144, 6)
+
+from pandas import DataFrame
+df = DataFrame(TSS_matrix_new)
+df.to_csv(r"Features_reshape_all_TSS_matrix_woM_all_RT_BCLL01_CNnorm.txt", sep='\t', index=False, header=False)
+#----------------------------------------------------------------------------------------------------------------
+#20200522 Extract Prediction result of 26 BCLL01 cells (R) (after CNnorm)
+#---------------------------------------------------------------------------------------------------------------- 
+files <- list.files("./", pattern="_norm.txt$", full.names=TRUE)
+write.table(files, "files_all.txt", sep="\t", quote=FALSE,row.names=FALSE, col.names=FALSE)
+
+
+
+
+files <- read.table("files_all.txt", header=F, sep ='\t', comment.char = "")
+filename <- matrix("filename", nrow(files), 1)
+for (i in 1:nrow(files)){
+	filename[i,1]<-strsplit(as.character(files[i,1]), './/Features_reshape_')[[1]][2]
+	filename[i,1]<-strsplit(filename[i,1], '_orientation_norm.txt')[[1]][1]
+}
+
+
+TSS_matrix <- read.table("/g/korbel2/StrandSeq/Test_HJ/Files_ASE/Features_RPE_DNN/Features_reshape_all_TSS_matrix_woM_all_RT_BCLL01_CNnorm.txt", header=F, sep ='\t', comment.char = "")
+TSS_matrix$Sample <- "BCLL01"
+samplename <- matrix(filename[1], (nrow(TSS_matrix)/nrow(files)), 1)
+for (i in 2:nrow(files)){
+	samplename <- rbind(samplename, matrix(filename[i], (nrow(TSS_matrix)/nrow(files)), 1))
+	cat(paste0(i, ' '))
+}
+TSS_matrix$Sample <- samplename
+
+
+chromosome <- c('chr1', 'chr2', 'chr3', 'chr4', 'chr5', 'chr6', 'chr7', 'chr8', 'chr9', 'chr10', 'chr11', 'chr12', 'chr13', 'chr14', 'chr15', 'chr16', 'chr17', 'chr18', 'chr19', 'chr20', 'chr21', 'chr22', 'chrX')
+
+Pred_all <- data.frame(matrix(vector(), 0, 9, dimnames=list(c(), c("chr", "start", "end", "GeneID", "a", "b", "Sample", "Unexpressed", "Expressed"))), stringsAsFactors=F)
+for (i in 1:length(chromosome)){
+	Pred_file <- paste0('RPE1_WT_BM510_C7_CNnorm_test_BCLL01_ypred_sc_', chromosome[i], '.csv')
+	Pred_result <- read.table(Pred_file, header=F, sep =' ', comment.char = "")
+	TSS_matrix_chr <- TSS_matrix[TSS_matrix[,1] == chromosome[i],]
+	Pred_all <- rbind(Pred_all, cbind(TSS_matrix_chr, Pred_result))
+}
+
+colnames(Pred_all) <- c("chr", "start", "end", "GeneID", "a", "b", "Sample", "Unexpressed", "Expressed")
+
+#Pred_cell <- Pred_all[Pred_all$Sample == "BCLL01_PE20467",]
+#write.table(Pred_cell, "Pred_cell_BCLL01_PE20467.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+
+Pred_cell_all <- data.frame(matrix(vector(), 19544, 0))
+for (i in 1:nrow(files)){
+	Pred_cell <- Pred_all[Pred_all$Sample == filename[i],]
+	#Pred_cell_output <- paste0("Pred_cell_", filename[i], ".txt")
+	#write.table(Pred_cell, Pred_cell_output, row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+	Pred_cell_all <- cbind(Pred_cell_all, Pred_cell[,9])
+}
+colnames(Pred_cell_all) <- filename
+write.table(Pred_cell_all, "Pred_cell_BCLL01_CNnorm_all.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+write.table(Pred_cell[,1:4], "Pred_cell_BCLL01_CNnorm_all_annot.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+
+
+
+
+
+---------------------------------------------------
+##20200525 Cell-type specific genes from infered transcriptome (BCLL01)
+---------------------------------------------------
+
+setwd('/Users/jeong/Documents/Coursera/Deeplearning_sc')
+
+##1) Load infered transcriptome
+data1_exp<-read.table("Pred_cell_BCLL01_CNnorm_all.txt", sep = '\t', header=T, comment.char = "")
+data1_exp_annot<-read.table("Pred_cell_BCLL01_CNnorm_all_annot.txt", sep = '\t', header=T, comment.char = "")
+
+data1_exp_new <- data1_exp
+data1_exp_new_call <- data1_exp_new
+
+data1_exp_new_call[data1_exp_new>=0.5] <- 1
+data1_exp_new_call[data1_exp_new<0.5] <- 0
+data1_exp_new_stat <- as.matrix(rowSums(data1_exp_new_call))
+data1_exp_new_stat <- cbind(data1_exp_new_stat, matrix(0, nrow(data1_exp_new_stat), 1))
+
+barplot(colSums(data1_exp_new_call), las=2, main='BCLL01', ylab='number of expressed genes')
+
+i=1
+sum(data1_exp_new_call[,i]==1 & rowMedians(as.matrix(data1_exp_new_call[,setdiff(c(1:ncol(data1_exp_new_call)), i)] ))==0)
+
+data1_exp_new_call_specific <- matrix(0, nrow(data1_exp_new), ncol(data1_exp_new))
+for (i in 1:ncol(data1_exp_new_call)){
+	tmp <- data1_exp_new_call[,i]==1 & rowMedians(as.matrix(data1_exp_new_call[,setdiff(c(1:ncol(data1_exp_new_call)), i)] ))==0
+	data1_exp_new_call_specific[,i] <- as.matrix(tmp)
+}
+colnames(data1_exp_new_call_specific) <- colnames(data1_exp_new)
+#write.table(data1_exp_new_call_specific, "data1_exp_new_call_specific_BCLL01.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+barplot(colSums(data1_exp_new_call_specific), las=2, main='BCLL01, cell specific', ylab='number of expressed genes')
+
+
+#tmp1 <- rowSums(data1_exp_new_call_specific)>0
+#tmp2 <- data1_exp_new_stat[,1]<=18 & data1_exp_new_stat[,1]>0
+data1_exp_new_stat[,2] <- rowSums(data1_exp_new_call_specific)>0
+
+
+##Measure standard deviation
+data1_exp_new_stat <- cbind(data1_exp_new_stat, matrix(0, nrow(data1_exp_new_stat), 1))
+for (i in 1:nrow(data1_exp_new)){
+	data1_exp_new_stat[i,3] <- sd(data1_exp_new[i,])
+}
+
+#> sum(data1_exp_new_stat[,3]>min(data1_exp_new_stat[rowSums(data1_exp_new_call_specific)>1,],3))
+#[1] 5039
+#write.table(data1_exp_new_stat, "data1_exp_new_stat_BCLL01.txt", row.names = TRUE, col.names = TRUE, sep="\t", quote = FALSE)
+
+library (pheatmap)
+library (gplots)
+
+breaksList = seq(-2, 2, by = 0.1)
+breaksList=append(breaksList, 20)
+breaksList=append(breaksList, -20, 0)
+mycol <- colorpanel(n=length(breaksList)-1,low="blue", mid = "white", high="red")
+
+pheatmap(data1_exp_new_call_specific[rowSums(data1_exp_new_call_specific)>0,], show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=T, scale="row", col=mycol, breaks = breaksList, clustering_distance_cols ="correlation", cex=0.8)
+res <- pheatmap(data1_exp_new[rowSums(data1_exp_new_call_specific)>0,], show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=T, scale="row", col=mycol, breaks = breaksList, clustering_distance_cols ="correlation", cex=0.8)
+#res <- pheatmap(data1_exp_new[data1_exp_new_stat[,3]>min(data1_exp_new_stat[rowSums(data1_exp_new_call_specific)>1,],3),], show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=T, scale="row", col=mycol, breaks = breaksList, clustering_distance_cols ="correlation", cex=0.8)
+#res <- pheatmap(data1_exp_new[data1_exp_new_stat[,3]>0.1 & data1_exp_new_stat[,1]>0,], show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=T, scale="row", col=mycol, breaks = breaksList, clustering_distance_cols ="correlation", cex=0.8)
+
+
+cluster = cutree(res$tree_row, k = 4)
+
+
+data_mat_lab3_chromvar_pc<-cluster
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==1]<-"plum2"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==2]<-"dodgerblue"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==3]<-"blue4"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==4]<-"cadetblue1"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==5]<-"moccasin"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==6]<-"palevioletred4"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==7]<-"gold"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==8]<-"darkgreen"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==9]<-"aquamarine2"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==10]<-"firebrick1"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==11]<-"darkorange"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==12]<-"yellowgreen"
+data_mat_lab3_chromvar_pc[data_mat_lab3_chromvar_pc==13]<-"purple"
+
+Var1        <- c("plum2", "dodgerblue", "blue4", "cadetblue1", "moccasin", "palevioletred4", "gold", "darkgreen", "aquamarine2", "firebrick1", "darkorange", "yellowgreen", "purple")
+names(Var1) <- c("plum2", "dodgerblue", "blue4", "cadetblue1", "moccasin", "palevioletred4", "gold", "darkgreen", "aquamarine2", "firebrick1", "darkorange", "yellowgreen", "purple")
+anno_colors <- list(Var1 = Var1)
+row_annotation_chromvar_pc <- as.data.frame(data_mat_lab3_chromvar_pc)
+rownames(row_annotation_chromvar_pc) <- rownames(data1_exp_new[data1_exp_new_stat[,3]>0.1 & data1_exp_new_stat[,1]>0,])
+colnames(row_annotation_chromvar_pc) <- "Var1"
+
+res <- pheatmap(data1_exp_new[data1_exp_new_stat[,3]>0.1 & data1_exp_new_stat[,1]>0,], annotation_row = row_annotation_chromvar_pc, show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=T, scale="row", col=mycol, breaks = breaksList, clustering_distance_cols ="correlation", cex=0.8, annotation_colors = anno_colors)
+
+write.table(cluster, "cluster_variable_genes_BCLL01.txt", sep="\t", quote=FALSE,row.names=TRUE, col.names=TRUE)
+
+
+data1_exp_for_MOFA <- data1_exp_new[rowSums(data1_exp_new_call_specific)>0,]
+data1_exp_for_MOFA_genes <- data1_exp_annot[rowSums(data1_exp_new_call_specific)>0,]
+rownames(data1_exp_for_MOFA) <- data1_exp_for_MOFA_genes[,4]
+write.table(data1_exp_for_MOFA, "data1_exp_for_MOFA.txt", sep="\t", quote=FALSE,row.names=TRUE, col.names=TRUE)
+
+
+data1_exp_for_MOFA_big <- data1_exp_new[data1_exp_new_stat[,3]>min(data1_exp_new_stat[rowSums(data1_exp_new_call_specific)>1,],3),]
+data1_exp_for_MOFA_genes_big <- data1_exp_annot[data1_exp_new_stat[,3]>min(data1_exp_new_stat[rowSums(data1_exp_new_call_specific)>1,],3),]
+rownames(data1_exp_for_MOFA_big) <- data1_exp_for_MOFA_genes_big[,4]
+write.table(data1_exp_for_MOFA_big, "data1_exp_for_MOFA_big.txt", sep="\t", quote=FALSE,row.names=TRUE, col.names=TRUE)
+
+
+data1_exp_for_MOFA_big <- data1_exp_new[data1_exp_new_stat[,3]>0.1,]
+data1_exp_for_MOFA_genes_big <- data1_exp_annot[data1_exp_new_stat[,3]>0.1,]
+rownames(data1_exp_for_MOFA_big) <- data1_exp_for_MOFA_genes_big[,4]
+write.table(data1_exp_for_MOFA_big, "data1_exp_for_MOFA_all.txt", sep="\t", quote=FALSE,row.names=TRUE, col.names=TRUE)
+
+
+
+
+
+---------------------------------------------------
+##20200604 Make annotation file for the TF target gene databases
+---------------------------------------------------
+##Info for transfac : http://gene-regulation.com/pub/databases/transfac/doc/matrix1SM.html 
+##setwd('/Users/jeong/Documents/Strand_Seq/Deeptool/deeptool_SCDE')
+Gene_matrix <- read.table("/Users/jeong/Documents/Coursera/Deeplearning_sc/Pred_cell_BCLL01_CNnorm_all_annot.txt", sep = '\t', header=T, comment.char = "")
+Gene_matrix_Entrez <- read.table("/Users/jeong/Documents/Coursera/Deeplearning_sc/Pred_cell_BCLL01_CNnorm_all_annot_Entrez.txt", sep = '\t', header=T, comment.char = "")
+GB_matrix <- Gene_matrix_Entrez
+
+setwd('/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome')
+TFDB <- read.table("c3.all.v6.2.entrez_Msigdb.txt", header=FALSE, sep ='@')
+
+##For Msigdb downloaded annotations
+TFDB_tf <- matrix(0, nrow(TFDB), 1)
+TFDB_target <- matrix(0, nrow(GB_matrix), nrow(TFDB))
+for (i in 1:nrow(TFDB)){
+	TFDB_line <- strsplit(as.character(TFDB[i,1]), '\t')[[1]]
+	TFDB_tf[i,1] <- TFDB_line[1]
+	TFDB_line_list <- as.numeric(TFDB_line[3:length(TFDB_line)])
+	
+	for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target1 <- TFDB_target ##Msigdb TF annotations
+
+
+##For Harmonizome downloaded annotations (CHIA)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_CHIA_targets_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target2 <- TFDB_target ##CHIA TF annotations
+
+
+##For Harmonizome downloaded annotations (ENCODE)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_ENCODE_TF_targets_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target3 <- TFDB_target ###ENCODE TF annotations
+
+
+##For Harmonizome downloaded annotations (Jaspar)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_Jaspar_predicted_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target4 <- TFDB_target ###Jaspar predicted TF annotations
+
+
+##For Harmonizome downloaded annotations (Motifmap)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_Motifmap_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target5 <- TFDB_target ###Motifmap TF annotations
+
+
+##For Harmonizome downloaded annotations (transfac_curated)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_transfac_curated_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target6 <- TFDB_target ###transfac_curated TF annotations
+
+
+##For Harmonizome downloaded annotations (transfac_predicted)
+TFDB <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/gene_attribute_matrix_transfac_predicted_hb.txt", header=TRUE, sep ='\t')
+TFDB_data <- TFDB[,3:ncol(TFDB)]
+TFDB_tf <- colnames(TFDB_data)
+TFDB_target <- matrix(0, nrow(GB_matrix), length(TFDB_tf))
+for (i in 1:length(TFDB_tf)){
+	TFDB_line_list <- as.numeric(TFDB[TFDB_data[,i]==1,2])
+	
+		for (j in 1:length(TFDB_line_list)){
+		if (sum((GB_matrix$EntrezID==TFDB_line_list[j]),na.rm=T)>0){
+			TFDB_target[(GB_matrix$EntrezID==TFDB_line_list[j]), i] <- 1
+		}		
+	}
+	cat(paste0(i, ' '))
+}
+colnames(TFDB_target) <- TFDB_tf
+
+TFDB_target7 <- TFDB_target ###transfac_predicted TF annotations
+
+##This is for Msigdb
+Gene_class <- read.table("/Users/jeong/Documents/Strand_Seq/Ref_genome/Harmonizome/Msigdb_C3_class.txt", header=TRUE, sep ='\t')
+TFDB_target1 <- TFDB_target1[,Gene_class[,2]=="TF"]
+TFDB_target1_4 <- cbind(TFDB_target1, TFDB_target4)
+TFDB_target_all <- cbind(TFDB_target1, TFDB_target2, TFDB_target4, TFDB_target5, TFDB_target6, TFDB_target7)
+
+
+
+#write.table(as.matrix(colSums(TFDB_target_all)), file = "/Users/jeong/Documents/Coursera/Deeplearning_sc/TF_list.txt", row.names = TRUE, col.names = TRUE, sep = "\t", quote = FALSE)
+
+
+
+> ncol(TFDB_target1)
+[1] 500
+> ncol(TFDB_target2)
+[1] 199
+> ncol(TFDB_target4)
+[1] 111
+> ncol(TFDB_target5)
+[1] 332
+> ncol(TFDB_target6)
+[1] 201
+> ncol(TFDB_target7)
+[1] 158
+
+
+setwd('/Users/jeong/Documents/Coursera/Deeplearning_sc')
+
+##1) Load infered transcriptome
+data1<-read.table("/Users/jeong/Documents/Coursera/Deeplearning_sc/Summary_BCLL01_Wnt_signaling.txt", sep = '\t', header=T, comment.char = "")
+data1_exp<-read.table("Pred_cell_BCLL01_CNnorm_all.txt", sep = '\t', header=T, comment.char = "")
+data1_exp_annot<-read.table("Pred_cell_BCLL01_CNnorm_all_annot.txt", sep = '\t', header=T, comment.char = "")
+
+data1_exp_new <- data1_exp
+data1_exp_new_call <- data1_exp_new
+
+data1_exp_new_call[data1_exp_new>=0.5] <- 1
+data1_exp_new_call[data1_exp_new<0.5] <- 0
+data1_exp_new_stat <- as.matrix(rowSums(data1_exp_new_call))
+data1_exp_new_stat <- cbind(data1_exp_new_stat, matrix(0, nrow(data1_exp_new_stat), 1))
+
+##2) Scaling of infered transcriptome
+data1_exp_scale <- data1_exp
+for (i in 1:nrow(data1_exp_scale)){
+	data1_exp_scale[i,] <- scale(t(data1_exp_scale[i,]))
+	cat(paste0(i, ' '))
+}
+
+##3) Load clonality
+data1_SV<-read.table("BCLL01_clonality.txt", sep = '\t', header=T, comment.char = "")
+data1_exp_scale_med <- cbind(rowMedians(as.matrix(data1_exp_scale[,data1_SV[,2]=="WT"])), rowMedians(as.matrix(data1_exp_scale[,data1_SV[,2]=="10del_large"])), data1_exp_scale[,data1_SV[,2]=="10del_small"])
+colnames(data1_exp_scale_med) <- c("C1", "C3", "C4")
+
+tmp <- as.matrix(colMedians(as.matrix(data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1,])))
+barplot(t(tmp), las=2, cex.names = 0.8, ylab='prediction score')
+boxplot(as.matrix(data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),]), ylab='expression z-score')
+data1_exp_scale_med_gene <- as.matrix(data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),])             
+barplot(data1_exp_scale_med_gene[1,c(1,3)], main='MITF', ylab='scaled prediction score')
+barplot(data1_exp_scale_med_gene[2,c(1,3)], main='NCOA2', ylab='scaled prediction score')
+barplot(data1_exp_scale_med_gene[3,c(1,3)], main='MMP14', ylab='scaled prediction score')
+barplot(data1_exp_scale_med_gene[4,c(1,3)], main='OCA2', ylab='scaled prediction score')
+barplot(data1_exp_scale_med_gene[5,c(1,3)], main='HERC2', ylab='scaled prediction score')
+
+ind_db <- c(321, 321)
+TFDB_target_all_sub <- TFDB_target_all[,ind_db]
+boxplot(as.matrix(data1_exp_scale_med[rowSums(TFDB_target_all_sub)>0 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),]), ylab='expression z-score')
+
+
+
+t.test(data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),1], data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),3], paired=T)
+
+
+> t.test(data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),1], data1_exp_scale_med[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),3], paired=T)
+
+	Paired t-test
+
+data:  data1_exp_scale_med[data1[, 8] == 1 & data1[, 11] > 0.1 & (rowMedians(as.matrix(data1[,  and data1_exp_scale_med[data1[, 8] == 1 & data1[, 11] > 0.1 & (rowMedians(as.matrix(data1[,     12:14])) > 0.5), 1] and     12:14])) > 0.5), 3]
+t = -5.0149, df = 4, p-value = 0.007412
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -0.8867541 -0.2547685
+sample estimates:
+mean of the differences 
+             -0.5707613 
+             
+             
+data1_exp_scale_med_sc <- cbind(rowMedians(as.matrix(data1_exp_scale[,data1_SV[,2]=="WT"])), (as.matrix(data1_exp_scale[,data1_SV[,2]=="10del_large"])), data1_exp_scale[,data1_SV[,2]=="10del_small"])
+colnames(data1_exp_scale_med_sc) <- c("C1", "C3_1", "C3_2", "C4")
+boxplot(as.matrix(data1_exp_scale_med_sc[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),]), ylab='expression z-score')   
+data1_exp_scale_med_sc_gene <- as.matrix(data1_exp_scale_med_sc[data1[,8]==1 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),])             
+barplot(data1_exp_scale_med_sc_gene[1,], main='MITF')
+barplot(data1_exp_scale_med_sc_gene[2,], main='NCOA2')
+barplot(data1_exp_scale_med_sc_gene[3,], main='MMP14')
+barplot(data1_exp_scale_med_sc_gene[4,], main='OCA2')
+barplot(data1_exp_scale_med_sc_gene[5,], main='HERC2')
+
+
+
+
+
+
+
+
+
+---------------------------------------------------
+##20200610 Plots before scaling
+---------------------------------------------------
+
+data1<-read.table("/Users/jeong/Documents/Coursera/Deeplearning_sc/Summary_BCLL01_Wnt_signaling.txt", sep = '\t', header=T, comment.char = "")
+tmp <- as.matrix(colMedians(as.matrix(data1[data1[,8]==1 & data1[,11]>0.1,12:14])))
+rownames(tmp) <- colnames(data1[,12:14])
+barplot(t(tmp), las=2, cex.names = 0.8, ylab='prediction score')
+boxplot(as.matrix(data1[data1[,8]==1 & data1[,11]>0.1,12:14]))
+
+
+
+
+tmp <- as.matrix(colMedians(as.matrix(data1[data1[,16]==1 & data1[,11]>0.1,12:14])))
+rownames(tmp) <- colnames(data1[,12:14])
+barplot(t(tmp), las=2, cex.names = 0.8, ylab='prediction score')
+
+
+
+
+ind_db <- c(321, 357, 395, 468, 469)
+TFDB_target_all_sub <- TFDB_target_all[,ind_db]
+boxplot(as.matrix(data1[rowSums(TFDB_target_all_sub)>0 & data1[,11]>0.2,12:14]), las=2, cex.names = 0.8, ylab='prediction score', main="Msigdb")
+
+
+
+ind_db <- c(822, 852, 936)
+TFDB_target_all_sub <- TFDB_target_all[,ind_db]
+boxplot(as.matrix(data1[rowSums(TFDB_target_all_sub)>0 & data1[,11]>0.2,12:14]), las=2, cex.names = 0.8, ylab='prediction score', main="Motifmap")
+boxplot(as.matrix(data1_exp_scale_med_sc[rowSums(TFDB_target_all_sub)>0 & data1[,11]>0.1 & (rowMedians(as.matrix(data1[,12:14]))>0.5),]), las=2, cex.names = 0.8, ylab='prediction score', main="Motifmap")
+
+
+ind_db <- c(936, 1174, 321)
+TFDB_target_all_sub <- TFDB_target_all[,ind_db]
+boxplot(as.matrix(data1[rowSums(TFDB_target_all_sub)>0 & data1[,11]>0.2,12:14]), las=2, cex.names = 0.8, ylab='prediction score', main="transfac curated")
+
+
+
