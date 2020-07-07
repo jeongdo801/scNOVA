@@ -9,10 +9,12 @@ Analysis pipeline (workflow management using Snakemake)
 PART0. Extract single-cell and subclonal copy-number variations
 <br/><br/>
 PART1. Infer transcriptome with pseudo-bulk population
-  - Feature1 : samtools merge for pseudo-bulk NO, Strand_seq_deeptool_Genes_for_CNN.pl
+  - Feature1 : samtools merge for pseudo-bulk NO, 
+    - Create folders/subclone and copy single-cell libraries to the clonality, merge bam files in each folders, run Strand_seq_deeptool_Genes_for_CNN.pl for merged libraries
     - Make_ML_Features_BCLL01 (processing and normalization to make Feature1)
     - For normalization total mapped read needs to be calculated (Strand_seq_deeptool_chr_length.pl)
   - Feature2 : single-cell variance : Deeptool_matrix_CNN_C0.R
+    - For each folders of subclone, run Strand_seq_deeptool_Genes_for_CNN.pl for single-cell libraries
     - Make_ML_Features_sc_var_BCLL01 (processing and normaliization to make Feature2)
   - Combine five layers of feature sets
 <br/><br/>
