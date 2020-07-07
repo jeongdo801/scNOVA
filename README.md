@@ -13,6 +13,7 @@ PART1. Infer transcriptome with pseudo-bulk population
     - Make_ML_Features_BCLL01 (processing and normalization to make Feature1)
     - For normalization total mapped read needs to be calculated (Strand_seq_deeptool_chr_length.pl)
   - Feature2 : single-cell variance : Deeptool_matrix_CNN_C0.R
+    - Make_ML_Features_sc_var_BCLL01 (processing and normaliization to make Feature2)
   - Combine five layers of feature sets
 <br/><br/>
 PART2. Infer transcriptome at the single-cell level
