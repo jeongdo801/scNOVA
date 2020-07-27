@@ -152,9 +152,10 @@ Make sure the files are [tabix](https://github.com/samtools/tabix)-indexed.
 
 ## References
 
-For information on Strand-seq see
+For information on scTRIP see
 
-> Falconer E *et al.*, 2012 (doi: [10.1038/nmeth.2206](https://doi.org/10.1038/nmeth.2206))
+> Sanderes *et al.*, 2019 (doi: https://doi.org/10.1038/s41587-019-0366-x)
+
 
 
 
