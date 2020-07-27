@@ -1,4 +1,4 @@
-![scNOVA]
+scNOVA
 ====================================
 
 scNOVA : Single-Cell Nucleosome Occupancy and genetic Variation Analysis - summarized in a single [Snakemake](https://bitbucket.org/snakemake/snakemake) pipeline.
