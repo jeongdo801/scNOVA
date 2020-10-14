@@ -6,15 +6,15 @@ import os.path
  #                                                                             #
  # Set the sample name                                                         #
  #                                                                             #
-SAMPLE_NAME = "TALL03_DEA5"
-CLONE_NAME = ["clone1", "clone2"]
+SAMPLE_NAME = "Downsampling80_set3"
+CLONE_NAME = ["clone1", "clone2", "clone3", "clone4", "clone5"]
  #                                                                             #
  #                                                                             #
  # By default, the pipeline will expect file to be in a subfolder called       #
  # 'bam' and to be names *.bam and *.bai                                       #
  #                                                                             #
-BAMFILE, = glob_wildcards("bam/{cell}.bam")
-BAM_SC, = glob_wildcards("bam/{single_cells}.sort.mdup.bam")
+BAMFILE, = glob_wildcards("input_bam/{cell}.bam")
+BAM_SC, = glob_wildcards("input_bam/{single_cells}.sort.mdup.bam")
 #                                                                             #
  #                                                                             #
 abbreviate_names = False
@@ -25,6 +25,7 @@ configfile: "Snake.config.json"
 
 rule all:
     input:
+#        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam", cell=BAMFILE),
         expand("result/{s}.tab", s = SAMPLE_NAME),
         expand("result/{s}.npz", s = SAMPLE_NAME),
         expand("result/{s}_sort.txt", s = SAMPLE_NAME),
@@ -57,8 +58,9 @@ rule all:
         expand("result_CNN/DNN_train40_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_CNN/DNN_train20_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_CNN/DNN_train5_output_ypred_{c}_annot.txt", c = CLONE_NAME),
- #       expand("result_features_sc/CNN_preprocessing_{s}_sc.pdf", s = SAMPLE_NAME),
- #       expand("result_features_sc/Features_reshape_all_TSS_matrix_woM_all_sc.txt"),
+#        expand("result_features_sc/CNN_preprocessing_{s}_sc.pdf", s = SAMPLE_NAME),
+#        expand("result_features_sc_CN/SC_CN_DHS_for_CNN_{s}.txt", s = SAMPLE_NAME),
+#        expand("result_features_sc/Features_reshape_all_TSS_matrix_woM_all_sc.txt"),
  #       expand("result_features_sc/{s}_wovar_exp.txt", s = SAMPLE_NAME),
 
  #
@@ -66,65 +68,65 @@ rule all:
  # Read preprocessing
  #
 	
-rule remove_low_quality_reads:
-    input:
-        bam = "bam/{cell}.bam"
-    output:
-        bam_pre = "bam/{cell}.sc_pre_mono.bam",
-        bam_header = "bam/{cell}.header_test.sam"
-    shell:
-        """
-        module load SAMtools/1.3.1-foss-2016b
-		samtools view -H {input} > {output.bam_header} 
-		samtools view -F 2304 {input.bam} | awk -f utils/awk_1st.awk | cat {output.bam_header} - | samtools view -Sb - > {output.bam_pre}	
-        """
+#rule remove_low_quality_reads:
+#    input:
+#        bam = "input_bam/{cell}.bam"
+#    output:
+#        bam_pre = "bam/{cell}.sc_pre_mono.bam",
+#        bam_header = "bam/{cell}.header_test.sam"
+#    shell:
+#        """
+#        module load SAMtools/1.3.1-foss-2016b
+#		samtools view -H {input} > {output.bam_header} 
+#		samtools view -F 2304 {input.bam} | awk -f utils/awk_1st.awk | cat {output.bam_header} - | samtools view -Sb - > {output.bam_pre}	
+#        """
 
-rule sort_bam:
-    input:
-        "bam/{cell}.sc_pre_mono.bam"
-    output:
-        "bam/{cell}.sc_pre_mono_sort_for_mark.bam"
-    threads:
-        2
-    shell:
-        """
-        module load SAMtools/1.3.1-foss-2016b
-        samtools sort -@ {threads} -O BAM -o {output} {input}
-        """
+#rule sort_bam:
+#    input:
+#        "bam/{cell}.sc_pre_mono.bam"
+#    output:
+#        "bam/{cell}.sc_pre_mono_sort_for_mark.bam"
+#    threads:
+#        2
+#    shell:
+#        """
+#        module load SAMtools/1.3.1-foss-2016b
+#        samtools sort -@ {threads} -O BAM -o {output} {input}
+#        """
 
-rule index_num1:
-    input:
-        "bam/{cell}.sc_pre_mono_sort_for_mark.bam"
-    output:
-        "bam/{cell}.sc_pre_mono_sort_for_mark.bam.bai"
-    shell:
-        """
-        module load SAMtools/1.3.1-foss-2016b
-        samtools index {input}
-        """	
+#rule index_num1:
+#    input:
+#        "bam/{cell}.sc_pre_mono_sort_for_mark.bam"
+#    output:
+#        "bam/{cell}.sc_pre_mono_sort_for_mark.bam.bai"
+#    shell:
+#        """
+#        module load SAMtools/1.3.1-foss-2016b
+#        samtools index {input}
+#        """	
 	
-rule remove_dup:
-    input:
-        bam="bam/{cell}.sc_pre_mono_sort_for_mark.bam"
-    output:
-        bam_uniq="bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam",
-        bam_metrix="bam/{cell}.sc_pre_mono.metrix_dup.txt"
-    shell:
-        """
-        module load biobambam2/2.0.76-foss-2016b
- 		 bammarkduplicates markthreads=2 I={input.bam} O={output.bam_uniq} M={output.bam_metrix} index=1 rmdup=1
-        """
+#rule remove_dup:
+#    input:
+#        bam="bam/{cell}.sc_pre_mono_sort_for_mark.bam"
+#    output:
+#        bam_uniq="bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam",
+#        bam_metrix="bam/{cell}.sc_pre_mono.metrix_dup.txt"
+#    shell:
+#        """
+#        module load biobambam2/2.0.76-foss-2016b
+# 		 bammarkduplicates markthreads=2 I={input.bam} O={output.bam_uniq} M={output.bam_metrix} index=1 rmdup=1
+#        """
 
-rule index_num2:
-    input:
-        "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam"
-    output:
-        "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.bai"
-    shell:
-        """
-        module load SAMtools/1.3.1-foss-2016b
-        samtools index {input}
-        """
+#rule index_num2:
+#    input:
+#        "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam"
+#    output:
+#        "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.bai"
+#    shell:
+#        """
+#        module load SAMtools/1.3.1-foss-2016b
+#        samtools index {input}
+#        """
 
  #
  # PART II
@@ -450,6 +452,22 @@ rule annot_expressed_genes:
 #        Rscript {params.generate_feature_sc} {input.Deeptool_result_final} {input.CNN_features_annot} {input.table_CpG} {input.table_GC} {input.table_size} {input.TSS_matrix} {input.Deeptool_mapped} {input.FPKM} {output}
 #        """
 
+
+#rule generate_feature_sc_CN:
+#    input:
+#        Deeptool_result_final_merge = "utils/Deeptool_Genes_for_CNN_merge_sort_lab_final.txt",
+#        sv_calls  = "input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsTRUE_gtcutoff0_regfactor6_filterFALSE.txt",
+#        CNN_features_annot = "utils/bin_Genes_for_CNN_reshape_annot.txt",
+#    output:
+#        "result_features_sc_CN/SC_CN_DHS_for_CNN_" + SAMPLE_NAME + ".txt",
+#    params:
+#        generate_feature_sc_CN = config["generate_feature_sc_CN"]
+#    log:
+#        "log/generate_feature_sc_CN.log"
+#    shell:
+#        """
+#        Rscript {params.generate_feature_sc_CN} {input.Deeptool_result_final_merge} {input.sv_calls} {input.CNN_features_annot} {output} 
+#        """
 
 #rule combine_feature_sc:
 #    input:
