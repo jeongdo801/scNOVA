@@ -1,0 +1,346 @@
+#!/bin/bash
+
+mv BCLL01_120hp1_PE20510.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20510.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20510.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20512.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20512.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20512.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20515.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20515.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20515.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20520.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20520.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20520.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20535.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20535.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20535.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20542.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20542.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20542.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20550.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20550.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20550.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20551.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20551.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20551.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20578.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20578.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20578.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20582.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20582.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20582.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp1_PE20583.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp1_PE20583.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp1_PE20583.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20406.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20406.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20406.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20414.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20414.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20414.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20424.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20424.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20424.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20425.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20425.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20425.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20446.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20446.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20446.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20457.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20457.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20457.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20462.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20462.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20462.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20480.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20480.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20480.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20482.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20482.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20482.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20488.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20488.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20488.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20491.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20491.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20491.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_120hp2_PE20493.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_120hp2_PE20493.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_120hp2_PE20493.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20402.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20402.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20402.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20404.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20404.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20404.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20406.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20406.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20406.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20410.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20410.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20410.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20413.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20413.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20413.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20414.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20414.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20414.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20416.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20416.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20416.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20421.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20421.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20421.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20423.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20423.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20423.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20424.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20424.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20424.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20425.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20425.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20425.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20427.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20427.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20427.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20429.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20429.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20429.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20431.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20431.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20431.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20432.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20432.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20432.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20434.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20434.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20434.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20436.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20436.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20436.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20444.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20444.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20444.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20452.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20452.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20452.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20456.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20456.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20456.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20457.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20457.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20457.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20458.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20458.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20458.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20463.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20463.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20463.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20467.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20467.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20467.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20469.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20469.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20469.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20471.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20471.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20471.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20476.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20476.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20476.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20478.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20478.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20478.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20487.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20487.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20487.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20488.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20488.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20488.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp1_PE20494.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp1_PE20494.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp1_PE20494.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20305.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20305.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20305.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20307.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20307.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20307.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20309.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20309.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20309.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20312.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20312.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20312.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20313.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20313.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20313.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20316.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20316.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20316.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20323.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20323.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20323.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20328.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20328.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20328.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20329.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20329.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20329.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20333.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20333.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20333.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20334.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20334.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20334.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20335.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20335.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20335.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20336.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20336.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20336.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20343.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20343.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20343.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20344.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20344.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20344.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20349.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20349.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20349.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20352.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20352.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20352.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20353.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20353.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20353.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20354.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20354.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20354.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20355.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20355.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20355.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20356.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20356.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20356.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20357.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20357.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20357.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20364.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20364.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20364.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20366.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20366.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20366.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20371.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20371.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20371.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20373.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20373.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20373.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20384.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20384.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20384.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20386.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20386.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20386.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20387.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20387.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20387.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20389.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20389.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20389.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20393.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20393.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20393.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+mv BCLL01_90hp2_PE20394.sort.mdup.bam.sc_pre_mono_sort_for_mark_uniq.bam  BCLL01_90hp2_PE20394.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+
+samtools index BCLL01_90hp2_PE20394.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam
+

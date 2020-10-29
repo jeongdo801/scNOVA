@@ -1,0 +1,12 @@
+{
+    "count_sort_label" : "utils/count_sort_label.R",
+    "count_norm" : "utils/count_norm.R",
+    "feature_sc_var" : "utils/feature_sc_var.R",
+    "combine_features" : "utils/combine_features.R",
+    "annot_expressed" : "utils/annot_expressed.R",
+    "generate_feature_sc" : "utils/generate_feature_sc.R",
+    "combine_feature_sc" : "utils/combine_feature_sc.R", 
+    "generate_feature_sc_CN" : "utils/generate_feature_sc_CN.R",
+    "infer_diff_gene_expression" : "utils/infer_diff_gene_expression.R",
+}
+
