@@ -1,1 +1,4 @@
 utils/bin_Genes_for_CNN_sort.txt filter=lfs diff=lfs merge=lfs -text
+utils/bin_Genes_for_CNN_num_sort.txt filter=lfs diff=lfs merge=lfs -text
+utils/Deeptool_Genes_for_CNN_merge_sort_lab_final.txt filter=lfs diff=lfs merge=lfs -text
+utils/bin_Genes_for_CNN_num_sort_ann_sort_GC_ensemble.txt filter=lfs diff=lfs merge=lfs -text
