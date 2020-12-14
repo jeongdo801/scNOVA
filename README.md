@@ -5,7 +5,6 @@ scNOVA : Single-Cell Nucleosome Occupancy and genetic Variation Analysis - summa
 
 
 ## Overview of this workflow
-<br/><br/>
 PART0. Pre-requirement step - preparation of single-cell genetic information:
 Mosaicatcher: https://github.com/friendsofstrandseq/mosaicatcher-pipeline
 <br/><br/>
