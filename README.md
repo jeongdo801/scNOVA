@@ -10,8 +10,11 @@ PART0. Pre-requirement step - preparation of single-cell genetic information:
   - Mosaicatcher: https://github.com/friendsofstrandseq/mosaicatcher-pipeline
 <br/><br/>
 PART1. Read preprocessing
+<br/><br/>
 PART2. Read counting to generate single-cell genebody NO
+<br/><br/>
 PART3. Infer expressed genes of subclones
+<br/><br/>
 PART4. DE analysis of subclones
 
  
