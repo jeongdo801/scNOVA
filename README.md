@@ -3,6 +3,8 @@ scNOVA
 
 scNOVA : Single-Cell Nucleosome Occupancy and genetic Variation Analysis - summarized in a single [Snakemake](https://bitbucket.org/snakemake/snakemake) pipeline.
 
+
+## Overview of this workflow
 <br/><br/>
 PART0. Extract single-cell and subclonal copy-number variations
 <br/><br/>
@@ -29,24 +31,23 @@ PART2. Infer transcriptome at the single-cell level
 PART3. Infer transcriptome using CNN
   - Deeplearning_Nucleosome_with_mono_var_GC_CpG_RT_leave_Chr1_out_BCLL01_CNnorm_sc_wovar_ypred.py
 
-  
-
-## Overview of this workflow
-
-
-
-
+ 
 ## System requirements
-
+This workflow is mean to be run in a Unix-based operating system.
 
 
 ## Installation
-
+1. unix based tools : SAMtools/1.3.1-foss-2016b, biobambam2/2.0.76-foss-2016b, deeptools/2.5.1-foss-2016b-Python-2.7.12
+2. python packages : cuDNN, CUDA, TensorFlow, scikit-learn, matplotlib
+3. R packages : DESeq2, matrixStats, pheatmap, gplots, umap, Rtsne, factoextra, pracma 
 
 
 ## Setup
-
-
+1. Download this pipeline
+2. Add your single-cell data (input_bam folder)
+3. Add the subclonality information (input_user folder)
+4. Change the project name in the Snakefile
+5. Launch the run_pipeline.sh script
 
 ## References
 
