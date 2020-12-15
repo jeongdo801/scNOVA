@@ -17,8 +17,8 @@ PART3. Infer expressed genes of subclones
 PART4. DE analysis of subclones
 <br/><br/>
 Main output (GM20509 example data)
-1. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
-2. Single-cell level NO table : result/GM20509_sort.txt
+1. Single-cell level NO table : result/GM20509_sort.txt
+2. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
 3. Infer differential expression table : result/Result_scNOVA_infer_expression_table.txt
 4. Heatmap and UMAP visualization of significant hits : result_plots/Result_scNOVA_plots_GM20509.pdf
 <br/><br/> 
