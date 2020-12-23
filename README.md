@@ -16,6 +16,10 @@ PART3. Infer expressed genes of subclones
 <br/><br/>
 PART4. DE analysis of subclones
 <br/><br/>
+PART5. (Optional) Infer Single-cell TF motif accessibility using chromVAR (20201223 updated)
+<br/><br/>
+PART6. (Optional) Infer haplotype-resolved genebody NO (20201223 updated)
+<br/><br/>
 Main output (GM20509 example data)
 1. Single-cell level NO table : result/GM20509_sort_geneid.txt (20201223 updated)
 2. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
