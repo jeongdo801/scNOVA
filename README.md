@@ -25,6 +25,7 @@ Main output (GM20509 example data)
 2. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
 3. Infer differential expression table : result/Result_scNOVA_infer_expression_table.txt (20201223 updated)
 4. Heatmap and UMAP visualization of significant hits : result_plots/Result_scNOVA_plots_GM20509.pdf
+5. (Optional) Single-cell level TF motif deviation z-score : result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_GM20509.txt (20201223 updated)
 <br/><br/> 
 ## System requirements
 This workflow is mean to be run in a Unix-based operating system.
