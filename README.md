@@ -16,7 +16,7 @@ PART3. Infer expressed genes of subclones
 <br/><br/>
 PART4. DE analysis of subclones
 <br/><br/>
-PART5. (Optional) Infer Single-cell TF motif accessibility using chromVAR (20201223 updated), by default, Roadmap epigenomics DHS will be used to define CREs
+PART5. (Optional) Infer Single-cell TF motif accessibility using chromVAR (20201223 updated), by default, Roadmap epigenomics DHS (Enhancers) will be used to define CREs
 <br/><br/>
 PART6. (Optional) Infer haplotype-resolved genebody NO (20201223 updated)
 <br/><br/>
