@@ -35,7 +35,7 @@ This workflow is mean to be run in a Unix-based operating system.
 ## Installation
 1. unix based tools : SAMtools/1.3.1-foss-2016b, biobambam2/2.0.76-foss-2016b, deeptools/2.5.1-foss-2016b-Python-2.7.12
 2. python packages : cuDNN, CUDA, TensorFlow, scikit-learn, matplotlib
-3. R packages : DESeq2, matrixStats, pheatmap, gplots, umap, Rtsne, factoextra, pracma 
+3. R packages : DESeq2, matrixStats, pheatmap, gplots, umap, Rtsne, factoextra, pracma, chromVAR, nabor, motifmatchr 
 
 
 ## Setup
@@ -43,8 +43,8 @@ This workflow is mean to be run in a Unix-based operating system.
 2. **Preparation of input files**
 	* Add your single-cell bam and index files (input_bam/*.mark.mdup.bam)
 	* Add key result files from mosaicatcher output in the input_user folder
-	*input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt
-	*input_user/strandphaser_output.txt
+		* input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt
+		* input_user/strandphaser_output.txt
 	* Add the subclonality information (input_user/input_subclonality.txt)
 	* Add the genes within copy number changed region to mask in the infer differential expression result, if it's not provided, genes will not be masked. (input_user/input_SV_affected_genes.txt) 
 
