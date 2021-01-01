@@ -39,17 +39,17 @@ This workflow is mean to be run in a Unix-based operating system.
 
 
 ## Setup
-1. **Download this pipeline
-2. **Preparation of input files
+1. **Download this pipeline**
+2. **Preparation of input files**
 	* Add your single-cell bam and index files (input_bam/*.mark.mdup.bam)
-  * Add key result files from mosaicatcher output in the input_user folder
-    *input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt
-    *input_user/strandphaser_output.txt
-  * Add the subclonality information (input_user/input_subclonality.txt)
-  * Add the genes within copy number changed region to mask in the infer differential expression result, if it's not provided, genes will not be masked. (input_user/input_SV_affected_genes.txt) 
+	* Add key result files from mosaicatcher output in the input_user folder
+	*input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt
+	*input_user/strandphaser_output.txt
+	* Add the subclonality information (input_user/input_subclonality.txt)
+	* Add the genes within copy number changed region to mask in the infer differential expression result, if it's not provided, genes will not be masked. (input_user/input_SV_affected_genes.txt) 
 
-3. **Change the project name in the Snakefile
-4. **Launch the run_pipeline.sh script
+3. **Change the project name in the Snakefile**
+4. **Launch the run_pipeline.sh script**
 
 ## References
 
