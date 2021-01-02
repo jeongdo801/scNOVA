@@ -25,10 +25,14 @@ configfile: "Snake.config.json"
 
 rule all:
     input:
+        expand("input_user/sv_calls_all_print.txt"),
+        expand("input_user/Features_reshape_{c}_orientation_CN_correct0.txt", c = CLONE_NAME),
+        expand("input_user/sv_calls_all_print_CREs.txt"),
         expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam", cell=BAMFILE),
         expand("result/{s}.tab", s = SAMPLE_NAME),
         expand("result/{s}.npz", s = SAMPLE_NAME),
         expand("result/{s}_sort.txt", s = SAMPLE_NAME),
+        expand("result/{s}_sort_geneid.txt", s = SAMPLE_NAME),
         expand("result/Deeptool_Genes_for_CNN_{s}.tab", s = SAMPLE_NAME),
         expand("result/Deeptool_Genes_for_CNN_{s}.npz", s = SAMPLE_NAME),
         expand("result/Deeptool_Genes_for_CNN_{s}_sc.tab", s = SAMPLE_NAME),
@@ -59,10 +63,81 @@ rule all:
         expand("result_CNN/DNN_train20_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_CNN/DNN_train5_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_plots/Result_scNOVA_plots_{s}.pdf", s = SAMPLE_NAME),
+        expand("result/{s}_CREs_2kb.tab", s = SAMPLE_NAME),
+        expand("result/{s}_CREs_2kb.npz", s = SAMPLE_NAME),
+        expand("result/{s}_CREs_2kb_sort.txt", s = SAMPLE_NAME),
+        expand("result/{s}_CREs_2kb_sort_num.txt", s = SAMPLE_NAME),
+        expand("result/{s}_CREs_2kb_sort_num_sort_for_chromVAR.txt", s = SAMPLE_NAME),
+#        expand("result/SC_CN_regions_all_hg38_v2_resize_2kb_sc.txt"),
+        expand("result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
+        expand("result/motif_dev_chromVAR_DHS_2kb_Enh_{s}.Rda", s = SAMPLE_NAME),
+        expand("result/motif_variability_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W1.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W2.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C1.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C2.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam.bai", cell=BAMFILE),
+        expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam.bai", cell=BAMFILE),
+        expand("nucleosome_sampleA/result.H1.bam"),
+        expand("nucleosome_sampleB/result.H2.bam"),
+        expand("input_user/strandphaser_output_copy.txt"),
+        expand("result_haplo/Deeptool_DHS_2kb_H1H2.tab"),
+        expand("result_haplo/Deeptool_DHS_2kb_H1H2.npz"),
+        expand("result_haplo/Deeptool_DHS_2kb_H1H2_sort.txt"),
+        expand("result_haplo/Deeptool_Genebody_H1H2.tab"),
+        expand("result_haplo/Deeptool_Genebody_H1H2.npz"),
+        expand("result_haplo/Deeptool_Genebody_H1H2_sort.txt"),
 #        expand("result_features_sc/CNN_preprocessing_{s}_sc.pdf", s = SAMPLE_NAME),
 #        expand("result_features_sc_CN/SC_CN_DHS_for_CNN_{s}.txt", s = SAMPLE_NAME),
 #        expand("result_features_sc/Features_reshape_all_TSS_matrix_woM_all_sc.txt"),
  #       expand("result_features_sc/{s}_wovar_exp.txt", s = SAMPLE_NAME),
+
+ #
+ # PART 0
+ # Preparation of input
+ #
+
+rule generate_CN_for_CNN:
+    input:
+        subclone = "input_user/input_subclonality.txt",
+        sv_calls_all = "input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt",
+        Deeptool_result_final = "utils/Deeptool_Genes_for_CNN_merge_sort_lab_final.txt",
+        CNN_features_annot = "utils/bin_Genes_for_CNN_reshape_annot.txt",
+    output:
+        sv_calls_all_print = "input_user/sv_calls_all_print.txt",
+        CN_result_data1 = expand("input_user/Features_reshape_{clone}_orientation_CN_correct0.txt", clone = ["clone1", "clone2"]),
+    params:
+        generate_CN_for_CNN = config["generate_CN_for_CNN"]
+    log:
+        "log/generate_CN_for_CNN.log"
+    shell:
+        """
+        Rscript {params.generate_CN_for_CNN} {input.subclone} {input.sv_calls_all} {input.Deeptool_result_final} {input.CNN_features_annot} {output.sv_calls_all_print} 
+        """
+
+
+
+rule generate_CN_for_chromVAR:
+    input:
+        TSS_matrix = "utils/Strand_seq_matrix_TSS_for_SVM.txt",
+        TES_matrix = "utils/Strand_seq_matrix_TES_for_SVM.txt",
+        Genebody_matrix  = "utils/Strand_seq_matrix_Genebody_for_SVM.txt",
+        DHS_matrix_resize = "utils/regions_all_hg38_v2_resize_2kb_sort_num_sort_for_chromVAR.bed",
+        subclone = "input_user/input_subclonality.txt",
+        sv_calls_all = "input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt",
+    output:
+        sv_calls_all_print = "input_user/sv_calls_all_print_CREs.txt",
+    params:
+        generate_CN_for_chromVAR = config["generate_CN_for_chromVAR"]
+    log:
+        "log/generate_CN_for_chromVAR.log"
+    shell:
+        """
+        Rscript {params.generate_CN_for_chromVAR} {input.TSS_matrix} {input.TES_matrix} {input.Genebody_matrix} {input.DHS_matrix_resize} {input.subclone} {input.sv_calls_all} {output.sv_calls_all_print} 
+        """
+
 
  #
  # PART I
@@ -115,7 +190,7 @@ rule remove_dup:
     shell:
         """
         module load biobambam2/2.0.76-foss-2016b
- 		 bammarkduplicates markthreads=2 I={input.bam} O={output.bam_uniq} M={output.bam_metrix} index=1 rmdup=1
+        bammarkduplicates markthreads=2 I={input.bam} O={output.bam_uniq} M={output.bam_metrix} index=1 rmdup=1
         """
 
 rule index_num2:
@@ -160,15 +235,22 @@ rule count_sort_by_coordinate:
         """
 
 
+rule count_sort_annotate_geneid:
+    input:
+        count_table = "result/" + SAMPLE_NAME + "_sort.txt",
+        GB_matrix = "utils/Strand_seq_matrix_Genebody_for_SCDE.txt"
+    output:
+        "result/" + SAMPLE_NAME + "_sort_geneid.txt"
+    params:
+        count_sort_annotate_geneid = config["count_sort_annotate_geneid"]
+    shell:
+        """
+        Rscript {params.count_sort_annotate_geneid} {input.count_table} {input.GB_matrix} {output}  
+        """
+
+
 #
 # PART III
-# DE analysis of epigenome of subclones
-#
-
-
-
-#
-# PART IV
 # Infer expressed genes of subclones
 #
 
@@ -431,6 +513,10 @@ rule annot_expressed_genes:
         Rscript {params.annot_expressed} {input.TSS_annot} {input.train80} {input.train40} {input.train20} {input.train5} {output.train80_annot} {output.train40_annot} {output.train20_annot} {output.train5_annot}
         """
 
+#
+# PART IV
+# DE analysis of epigenome of subclones
+#
 
 rule infer_differential_gene_expression:
     input:
@@ -449,9 +535,222 @@ rule infer_differential_gene_expression:
         "log/infer_diff_gene_expression.log"
     shell:
         """
-        module load R/3.6.2-foss-2019b
+        #module load R/3.6.2-foss-2019b
         Rscript {params.infer_diff_gene_expression} {input.Genebody_NO} {input.clonality} {input.TSS_matrix} {input.GB_matrix} {input.CNN_result1} {input.CNN_result2} {input.input_matrix} {output}
         """
+
+
+#
+# PART V
+# Infer Single-cell TF motif accessibility using chromVAR
+#
+rule count_reads_CREs:
+    input:
+        bam = expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam", cell=BAMFILE),
+        bai = expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.bai", cell=BAMFILE)
+    output:
+        tab = "result/" + SAMPLE_NAME + "_CREs_2kb.tab",
+        npz = "result/" + SAMPLE_NAME + "_CREs_2kb.npz",
+    shell:
+        """
+        module load deeptools/2.5.1-foss-2016b-Python-2.7.12
+        multiBamSummary BED-file --BED utils/regions_all_hg38_v2_resize_2kb_sort.bed --bamfiles {input.bam} \
+            --extendReads --outRawCounts {output.tab} -out {output.npz}
+        """
+
+rule count_sort_by_coordinate_CREs:
+    input:
+        "result/" + SAMPLE_NAME + "_CREs_2kb.tab"
+    output:
+        "result/" + SAMPLE_NAME + "_CREs_2kb_sort.txt"
+    shell:
+        """
+        sort -k1,1 -k2,2n -k3,3n -t$'\t' {input} > {output}
+        """
+
+rule count_sort_annotate_chrid_CREs:
+    input:
+        "result/" + SAMPLE_NAME + "_CREs_2kb_sort.txt"
+    output:
+        "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num.txt"
+    params:
+        count_sort_annotate_chrid_CREs = config["count_sort_annotate_chrid_CREs"]
+    log:
+        "log/count_sort_annotate_chrid_CREs.log"
+    shell:
+        """
+        Rscript {params.count_sort_annotate_chrid_CREs} {input} {output} 
+        """
+
+rule count_sort_annotate_chrid_CREs_sort:
+    input:
+        "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num.txt"
+    output:
+        "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num_sort_for_chromVAR.txt"
+    shell:
+        """
+        sort -k1,1n -k2,2n -k3,3n -t$'\t' {input} > {output}
+        """
+
+#rule generate_CREs_CN:
+#    input:
+#        Result_enh_prom = "utils/Result_enh_prom_sort_new_num_sort_for_chromVAR.txt",
+#        DHS_matrix_resize = "utils/regions_all_hg38_v2_resize_2kb_sort_num_sort_for_chromVAR.bed",
+#        sv_calls  = "input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsTRUE_gtcutoff0_regfactor6_filterFALSE.txt",
+#    output:
+#        "result/SC_CN_regions_all_hg38_v2_resize_2kb_sc.txt",
+#    params:
+#        generate_CREs_CN = config["generate_CREs_CN"]
+#    log:
+#        "log/generate_CREs_CN.log"
+#    shell:
+#        """
+#        Rscript {params.generate_CREs_CN} {input.Result_enh_prom} {input.DHS_matrix_resize} {input.sv_calls} {output}
+#        """
+
+rule NO_chromVAR:
+    input:
+        DHS_annot_resize = "utils/Result_enh_prom_sort_new_num_sort_for_chromVAR.txt",
+        DHS_matrix_resize = "utils/regions_all_hg38_v2_resize_2kb_sort_num_sort_for_chromVAR.bed",
+        SC_CN_DHS = "input_user/sv_calls_all_print_CREs.txt",
+        data1_resize = "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num_sort_for_chromVAR.txt",
+        class_label = "input_user/input_subclonality.txt",
+    output:
+        motif_zscore = "result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
+        motif_dev = "result/motif_dev_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".Rda",
+        motif_variability = "result/motif_variability_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
+    params:
+        NO_chromVAR = config["NO_chromVAR"]
+    log:
+        "log/NO_chromVAR.log"
+    shell:
+        """
+        Rscript {params.NO_chromVAR} {input.DHS_annot_resize} {input.DHS_matrix_resize} {input.SC_CN_DHS} {input.data1_resize} {input.class_label} {output.motif_zscore} {output.motif_dev} {output.motif_variability} 
+        """
+
+
+
+
+#
+# PART VI
+# Infer haplotype-resolved genebody NO
+#
+rule split_bam_WC:
+    input:
+        "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam"
+    output:
+        bam_header = "bam/{cell}.header_WC.sam",
+        bam_C1 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C1.bam",
+        bam_C2 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C2.bam",
+        bam_W1 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W1.bam",
+        bam_W2 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W2.bam",
+    shell:
+        """
+        module load SAMtools/1.3.1-foss-2016b
+        samtools view -H {input} > {output.bam_header}
+        samtools view -f 99 {input} | cat {output.bam_header} - | samtools view -Sb - > {output.bam_C1}
+        samtools view -f 147 {input} | cat {output.bam_header} - | samtools view -Sb - > {output.bam_C2}
+        samtools view -f 83 {input} | cat {output.bam_header} - | samtools view -Sb - > {output.bam_W1}
+        samtools view -f 163 {input} | cat {output.bam_header} - | samtools view -Sb - > {output.bam_W2}
+        """
+
+rule split_bam_WC_merge:
+    input:
+        bam_C1 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C1.bam",
+        bam_C2 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C2.bam",
+        bam_W1 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W1.bam",
+        bam_W2 = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W2.bam",
+    output:
+        bam_C = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam",
+        bam_W = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam",
+    shell:
+        """
+        module load SAMtools/1.3.1-foss-2016b
+        samtools merge {output.bam_C} {input.bam_C1} {input.bam_C2}
+        samtools merge {output.bam_W} {input.bam_W1} {input.bam_W2}
+        """
+
+rule split_bam_WC_index:
+    input:
+        bam_C = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam",
+        bam_W = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam",
+    output:
+        bam_C_ind = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam.bai",
+        bam_W_ind = "bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam.bai",
+    shell:
+        """
+        module load SAMtools/1.3.1-foss-2016b
+        samtools index {input.bam_C}
+        samtools index {input.bam_W}
+        """
+
+rule perl_split_sc:
+    input:
+        strandphaser_output = "input_user/strandphaser_output.txt",
+        bam_C_ind = expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C.bam.bai", cell=BAMFILE),
+        bam_W_ind = expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W.bam.bai", cell=BAMFILE),
+    output:
+        nucleosome_sampleA = "nucleosome_sampleA/result.H1.bam",
+        nucleosome_sampleB = "nucleosome_sampleB/result.H2.bam",
+        perl_split_output = "input_user/strandphaser_output_copy.txt",
+    shell:
+        """
+        perl utils/perl_test_all_snake.pl
+        """
+
+rule count_reads_CREs_haplo:
+    input:
+        bam1 = "nucleosome_sampleA/result.H1.bam",
+        bam2 = "nucleosome_sampleB/result.H2.bam",
+    output:
+        tab = "result_haplo/Deeptool_DHS_2kb_H1H2.tab",
+        npz = "result_haplo/Deeptool_DHS_2kb_H1H2.npz",
+    shell:
+        """
+        module load deeptools/2.5.1-foss-2016b-Python-2.7.12
+        multiBamSummary BED-file --BED utils/regions_all_hg38_v2_resize_2kb_sort.bed --bamfiles {input.bam1} {input.bam2} \
+            --extendReads --outRawCounts {output.tab} -out {output.npz}
+        """
+
+rule count_reads_CREs_haplo_sort_by_coordinate:
+    input:
+        "result_haplo/Deeptool_DHS_2kb_H1H2.tab"
+    output:
+        "result_haplo/Deeptool_DHS_2kb_H1H2_sort.txt"
+    shell:
+        """
+        sort -k1,1 -k2,2n -k3,3n -t$'\t' {input} > {output}
+        """
+
+rule count_reads_genebody_haplo:
+    input:
+        bam1 = "nucleosome_sampleA/result.H1.bam",
+        bam2 = "nucleosome_sampleB/result.H2.bam",
+    output:
+        tab = "result_haplo/Deeptool_Genebody_H1H2.tab",
+        npz = "result_haplo/Deeptool_Genebody_H1H2.npz",
+    shell:
+        """
+        module load deeptools/2.5.1-foss-2016b-Python-2.7.12
+        multiBamSummary BED-file --BED utils/bin_Genebody_all.bed --bamfiles {input.bam1} {input.bam2} \
+            --extendReads --outRawCounts {output.tab} -out {output.npz}
+        """
+
+rule count_reads_genebody_haplo_sort_by_coordinate_genebody:
+    input:
+        "result_haplo/Deeptool_Genebody_H1H2.tab"
+    output:
+        "result_haplo/Deeptool_Genebody_H1H2_sort.txt"
+    shell:
+        """
+        sort -k1,1 -k2,2n -k3,3n -t$'\t' {input} > {output}
+        """
+
+
+#
+# PART V
+# Single-cell level inference of expression
+#
 
 #rule generate_feature_sc:
 #    input:

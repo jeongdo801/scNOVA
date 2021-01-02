@@ -1,4 +1,7 @@
 {
+    "generate_CN_for_CNN" : "utils/generate_CN_for_CNN.R",    
+    "generate_CN_for_chromVAR" : "utils/generate_CN_for_chromVAR.R",
+    "count_sort_annotate_geneid" : "utils/count_sort_annotate_geneid.R",
     "count_sort_label" : "utils/count_sort_label.R",
     "count_norm" : "utils/count_norm.R",
     "feature_sc_var" : "utils/feature_sc_var.R",
@@ -8,5 +11,9 @@
     "combine_feature_sc" : "utils/combine_feature_sc.R", 
     "generate_feature_sc_CN" : "utils/generate_feature_sc_CN.R",
     "infer_diff_gene_expression" : "utils/infer_diff_gene_expression.R",
+    "count_sort_annotate_geneid" : "utils/count_sort_annotate_geneid.R",
+    "count_sort_annotate_chrid_CREs" : "utils/count_sort_annotate_chrid_CREs.R",
+    "generate_CREs_CN" : "utils/generate_CREs_CN.R",
+    "NO_chromVAR" : "utils/NO_chromVAR.R",
 }
 
