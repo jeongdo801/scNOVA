@@ -292,7 +292,7 @@ GB_matrix_sort_woMT <-  GB_matrix_sort[TSS_matrix[,2]!="chrY" & TSS_matrix[,2]!=
 	res_sort_hit$Hit <- 0
 	res_sort_hit[input_matrix$blacklist==0 & res_sort$padj<0.1 & is.na(res_sort$padj)==0, ncol(res_sort_hit)] <- 1
 	
-	write.table(res_sort_hit, file = "result/Result_scNOVA_infer_expression_table.txt", row.names = TRUE, col.names = TRUE, sep = "\t", quote = FALSE)
+	write.table(cbind(GB_matrix_sort[,2:5], res_sort_hit), file = "result/Result_scNOVA_infer_expression_table.txt", row.names = TRUE, col.names = TRUE, sep = "\t", quote = FALSE)
 
 dev.off()
 
