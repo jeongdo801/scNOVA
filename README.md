@@ -40,6 +40,9 @@ This workflow is mean to be run in a Unix-based operating system.
 
 ## Setup
 1. **Download this pipeline**
+	* git lfs install
+	* git clone https://github.com/jeongdo801/scNOVA.git
+
 2. **Preparation of input files**
 	* Add your single-cell bam and index files (input_bam/*.sort.mdup.bam)
 	* Add key result files from mosaicatcher output in the input_user folder
