@@ -272,7 +272,7 @@ GB_matrix_sort_woMT <-  GB_matrix_sort[TSS_matrix[,2]!="chrY" & TSS_matrix[,2]!=
 
 	## Generate heatmap
 
-
+	if (sum(res_sort_woMT$padj<0.1, na.rm=T)>0){
 	breaksList = seq(-1.5, 1.5, by = 0.1)
 	breaksList=append(breaksList, 2)
 	breaksList=append(breaksList, -2, 0)
@@ -286,7 +286,7 @@ GB_matrix_sort_woMT <-  GB_matrix_sort[TSS_matrix[,2]!="chrY" & TSS_matrix[,2]!=
 	rownames(row_annotation_sort) <- rownames(normlogt_sort)
 	colnames(row_annotation_sort) <- "Var1"
 	pheatmap(normlogt_sort[,input_matrix_sort_woMT$blacklist==0 & res_sort_woMT$padj<0.1 & is.na(res_sort_woMT$padj)==0], show_rownames=F, show_colnames=T, cluster_cols=T, cluster_rows=F, scale="column", col=mycol, breaks = breaksList, clustering_distance_rows ="euclidean", cex=0.8, annotation_row = row_annotation, annotation_colors = anno_colors, clustering_method="ward.D")
-
+	}
 	
 	res_sort_hit <- cbind(res_sort, input_matrix$blacklist, Expressed_pred_median)
 	res_sort_hit$Hit <- 0
