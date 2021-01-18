@@ -58,7 +58,7 @@ This workflow is mean to be run in a Unix-based operating system.
 
 For information on scTRIP see
 
-> Sanderes *et al.*, 2019 (doi: https://doi.org/10.1038/s41587-019-0366-x)
+> Sanders *et al.*, 2019 (doi: https://doi.org/10.1038/s41587-019-0366-x)
 
 
 
