@@ -272,7 +272,7 @@ GB_matrix_sort_woMT <-  GB_matrix_sort[TSS_matrix[,2]!="chrY" & TSS_matrix[,2]!=
 
 	## Generate heatmap
 
-	if (sum(res_sort_woMT$padj<0.1, na.rm=T)>1){
+	if (sum(input_matrix_sort_woMT$blacklist==0 & res_sort_woMT$padj<0.1 & is.na(res_sort_woMT$padj)==0)>1){
 	breaksList = seq(-1.5, 1.5, by = 0.1)
 	breaksList=append(breaksList, 2)
 	breaksList=append(breaksList, -2, 0)
