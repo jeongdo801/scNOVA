@@ -114,6 +114,7 @@ rule generate_CN_for_CNN:
         "log/generate_CN_for_CNN.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.generate_CN_for_CNN} {input.subclone} {input.sv_calls_all} {input.Deeptool_result_final} {input.CNN_features_annot} {output.sv_calls_all_print} 
         """
 
@@ -135,6 +136,7 @@ rule generate_CN_for_chromVAR:
         "log/generate_CN_for_chromVAR.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.generate_CN_for_chromVAR} {input.TSS_matrix} {input.TES_matrix} {input.Genebody_matrix} {input.DHS_matrix_resize} {input.subclone} {input.sv_calls_all} {output.sv_calls_all_print} 
         """
 
@@ -245,6 +247,7 @@ rule count_sort_annotate_geneid:
         count_sort_annotate_geneid = config["count_sort_annotate_geneid"]
     shell:
         """
+	conda activate scNOVA
         Rscript {params.count_sort_annotate_geneid} {input.count_table} {input.GB_matrix} {output}  
         """
 
@@ -348,6 +351,7 @@ rule count_reads_for_DNN_sort_lab:
         count_sort_label = config["count_sort_label"]
     shell:
         """
+	conda activate scNOVA
         Rscript {params.count_sort_label} {input.count_reads_sort} {input.Ref_bed} {output.count_reads_sort_label}
         """
 
@@ -382,6 +386,7 @@ rule count_reads_for_DNN_normalization:
         count_norm = config["count_norm"]
     shell:
         """
+	conda activate scNOVA
         Rscript {params.count_norm} {input.count_reads_chr_length} {input.count_reads_sort_label} {input.CNN_features_annot} {input.table_CpG} {input.table_GC} {input.table_size} {input.TSS_matrix} {input.FPKM} {input.CN_result_data1} {output.plot} {output.table_mononuc_norm_data1}
         """
 
@@ -406,6 +411,7 @@ rule count_reads_for_DNN_sc_sort_lab:
         count_sort_label = config["count_sort_label"]
     shell:
         """
+	conda activate scNOVA
         Rscript {params.count_sort_label} {input.count_reads_sort} {input.Ref_bed} {output.count_reads_sort_label}
         """
 
@@ -440,6 +446,7 @@ rule generate_feature_sc_var:
         "log/generate_feature_sc_var_{clone}.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.feature_sc_var} {input.subclone_list} {input.count_reads_sc_sort} {input.Ref_bed_annot} {input.TSS_matrix} {input.CNN_features_annot} {input.FPKM} {input.CN_result_data1} {output.plot} {output.table_mononuc_var_data1} > {log} 2>&1
        """
 
@@ -464,6 +471,7 @@ rule combine_features:
         "log/combine_features_{clone}.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.combine_features} {input.TSS_matrix} {input.table_GC_imput} {input.table_CpG_imput} {input.table_RT} {input.table_mononuc_norm_data1} {input.CN_result_data1} {input.table_mononuc_var_data1} {input.FPKM} {output.features} {output.exp} {output.TSS_annot}
         """
 
@@ -481,6 +489,7 @@ rule infer_expressed_genes:
         "log/infer_expressed_genes_{clone}.log"
     shell:
         """
+	conda activate scNOVA
         module load foss/2019b
         module load Python/3.7.4-GCCcore-8.3.0
         module load cuDNN/7.6.4.38-gcccuda-2019b
@@ -510,6 +519,7 @@ rule annot_expressed_genes:
         "log/annot_expressed_genes_{clone}.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.annot_expressed} {input.TSS_annot} {input.train80} {input.train40} {input.train20} {input.train5} {output.train80_annot} {output.train40_annot} {output.train20_annot} {output.train5_annot}
         """
 
@@ -535,6 +545,7 @@ rule infer_differential_gene_expression:
         "log/infer_diff_gene_expression.log"
     shell:
         """
+	conda activate scNOVA
         #module load R/3.6.2-foss-2019b
         Rscript {params.infer_diff_gene_expression} {input.Genebody_NO} {input.clonality} {input.TSS_matrix} {input.GB_matrix} {input.CNN_result1} {input.CNN_result2} {input.input_matrix} {output}
         """
@@ -579,6 +590,7 @@ rule count_sort_annotate_chrid_CREs:
         "log/count_sort_annotate_chrid_CREs.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.count_sort_annotate_chrid_CREs} {input} {output} 
         """
 
@@ -625,6 +637,7 @@ rule NO_chromVAR:
         "log/NO_chromVAR.log"
     shell:
         """
+	conda activate scNOVA
         Rscript {params.NO_chromVAR} {input.DHS_annot_resize} {input.DHS_matrix_resize} {input.SC_CN_DHS} {input.data1_resize} {input.class_label} {output.motif_zscore} {output.motif_dev} {output.motif_variability} 
         """
 
