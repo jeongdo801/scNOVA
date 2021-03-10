@@ -26,7 +26,7 @@ configfile: "Snake.config.json"
 rule all:
     input:
         expand("input_user/sv_calls_all_print.txt"),
-        expand("input_user/Features_reshape_{c}_orientation_CN_correct0.txt", c = CLONE_NAME),
+        expand("result/Features_reshape_{c}_orientation_CN_correct0.txt", c = CLONE_NAME),
         expand("input_user/sv_calls_all_print_CREs.txt"),
         expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam", cell=BAMFILE),
         expand("result/{s}.tab", s = SAMPLE_NAME),
@@ -107,7 +107,7 @@ rule generate_CN_for_CNN:
         CNN_features_annot = "utils/bin_Genes_for_CNN_reshape_annot.txt",
     output:
         sv_calls_all_print = "input_user/sv_calls_all_print.txt",
-        CN_result_data1 = expand("input_user/Features_reshape_{clone}_orientation_CN_correct0.txt", clone = ["clone1", "clone2"]),
+        CN_result_data1 = expand("result/Features_reshape_{clone}_orientation_CN_correct0.txt", clone = ["clone1", "clone2"]),
     params:
         generate_CN_for_CNN = config["generate_CN_for_CNN"]
     log:
@@ -374,7 +374,7 @@ rule count_reads_for_DNN_normalization:
         table_size = "utils/Features_reshape_size_orientation.txt",
         TSS_matrix = "utils/Strand_seq_matrix_TSS_for_SVM.txt",
         FPKM = "utils/FPKM_sort_LCL_RPE_19770_renamed.txt",
-        CN_result_data1 = "input_user/Features_reshape_{clone}_orientation_CN_correct0.txt",
+        CN_result_data1 = "result/Features_reshape_{clone}_orientation_CN_correct0.txt",
     output:
         plot = "result/Features_reshape_" + SAMPLE_NAME + "_{clone}_orientation_norm_qc.pdf",
         table_mononuc_norm_data1 = "result/Features_reshape_{clone}_orientation_norm.txt",
@@ -430,7 +430,7 @@ rule generate_feature_sc_var:
         TSS_matrix = "utils/Strand_seq_matrix_TSS_for_SVM.txt",    
         CNN_features_annot = "utils/bin_Genes_for_CNN_reshape_annot.txt",
         FPKM = "utils/FPKM_sort_LCL_RPE_19770_renamed.txt",
-        CN_result_data1 = "input_user/Features_reshape_{clone}_orientation_CN_correct0.txt",
+        CN_result_data1 = "result/Features_reshape_{clone}_orientation_CN_correct0.txt",
     output:
         plot = "result/Features_reshape_" + SAMPLE_NAME + "_{clone}_Resid_orientation_qc.pdf",
         table_mononuc_var_data1 = "result/Features_reshape_{clone}_Resid_orientation.txt",
@@ -451,7 +451,7 @@ rule combine_features:
         table_CpG_imput = "utils/Features_reshape_CpG_orientation_impute.txt",
         table_RT = "utils/Features_reshape_RT_orientation.txt",
         table_mononuc_norm_data1 = "result/Features_reshape_{clone}_orientation_norm.txt",
-        CN_result_data1 = "input_user/Features_reshape_{clone}_orientation_CN_correct0.txt",
+        CN_result_data1 = "result/Features_reshape_{clone}_orientation_CN_correct0.txt",
         table_mononuc_var_data1 = "result/Features_reshape_{clone}_Resid_orientation.txt",
         FPKM = "utils/FPKM_sort_LCL_RPE_19770_renamed.txt",
     output:
