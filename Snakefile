@@ -14,7 +14,7 @@ CLONE_NAME = ["clone1", "clone2"]
  # 'bam' and to be names *.bam and *.bai                                       #
  #                                                                             #
 BAMFILE, = glob_wildcards("input_bam/{cell}.bam")
-BAM_SC, = glob_wildcards("input_bam/{single_cells}.sort.mdup.bam")
+#BAM_SC, = glob_wildcards("input_bam/{single_cells}.sort.mdup.bam")
 #                                                                             #
  #                                                                             #
 abbreviate_names = False
@@ -825,7 +825,7 @@ rule count_reads_genebody_haplo_sort_by_coordinate_genebody:
 
 #rule merge_feature_sc:
 #    input:
-#        feature_sc = expand("result_features_sc/Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_{single_cells}_wovar_exp.txt", single_cells=BAM_SC)
+#        feature_sc = expand("result_features_sc/Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_{single_cells}_wovar_exp.txt", s
 #    output:
 #        "result_features_sc/" + SAMPLE_NAME + "_wovar_exp.txt"
 #    shell:
