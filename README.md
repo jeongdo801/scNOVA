@@ -44,7 +44,7 @@ This workflow is mean to be run in a Unix-based operating system.
 	* git clone https://github.com/jeongdo801/scNOVA.git
 
 2. **Preparation of input files**
-	* Add your single-cell bam and index files (input_bam/*.sort.mdup.bam)
+	* Add your single-cell bam and index files (input_bam/*.bam)
 	* Add key result files from mosaicatcher output in the input_user folder
 		* input_user/simpleCalls_llr4_poppriorsTRUE_haplotagsFALSE_gtcutoff0.05_regfactor6_filterTRUE.txt
 		* input_user/strandphaser_output.txt
