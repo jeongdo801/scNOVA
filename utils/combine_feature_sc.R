@@ -21,7 +21,7 @@ files <- list.files("result_features_sc/", pattern="_norm.txt$", full.names=TRUE
 for (k in 1:length(files)){
 	filename <- strsplit(files[k], 'result_features_sc//Features_reshape_')[[1]][2]
 	filename <- strsplit(filename, '_orientation_norm.txt')[[1]][1]
-	filename <- strsplit(filename, '.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam')[[1]][1]
+	filename <- strsplit(filename, '.sc_pre_mono_sort_for_mark_uniq.bam')[[1]][1]
 	filename_CN <- paste0("result_features_sc_CN/Features_reshape_", filename, "_SC_orientation_CN.txt")
 
 	table_mononuc_norm_data1 <- read.table(files[k], header=F, sep ='\t', comment.char = "")

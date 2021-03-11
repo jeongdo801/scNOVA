@@ -31,8 +31,8 @@ foreach $clone_ind (@clone_all) {
 		print "clone: $clone\n";
 		print "---------\n";
 
-		`cp bam/$cell.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam bam_merge/$clone_ind`;
-		`cp bam/$cell.sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam.bai bam_merge/$clone_ind`;
+		`cp bam/$cell.sc_pre_mono_sort_for_mark_uniq.bam bam_merge/$clone_ind`;
+		`cp bam/$cell.sc_pre_mono_sort_for_mark_uniq.bam.bai bam_merge/$clone_ind`;
 
 		}
 		close (FILE);

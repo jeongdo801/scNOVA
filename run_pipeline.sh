@@ -1,3 +1,3 @@
 #!/bin/bash
 
-snakemake -j 10 --latency-wait 60 --restart-times 1 --use-conda
+snakemake -j 10 --latency-wait 60 --restart-times 1 --use-conda --rerun-incomplete >> output.txt

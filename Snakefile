@@ -6,7 +6,7 @@ import os.path
  #                                                                             #
  # Set the sample name                                                         #
  # Update 20201028                                                                            #
-SAMPLE_NAME = "GM20509"
+SAMPLE_NAME = "GM20509B"
 CLONE_NAME = ["clone1", "clone2"]
  #                                                                             #
  #                                                                             #
