@@ -16,7 +16,7 @@ for (i in 1:nrow(sv_calls_all)){
 
 for (k in 1:length(unique(subclone[,2]))){
 	subclone_lab <- paste0("clone", k)
-	filename <- paste0("input_user/Features_reshape_", subclone_lab, "_orientation_CN_correct0.txt")
+	filename <- paste0("result/Features_reshape_", subclone_lab, "_orientation_CN_correct0.txt")
 	
 	sv_calls_sub <- sv_calls_all[sv_calls_all[,ncol(sv_calls_all)]==subclone_lab,]
 	sv_calls <- sv_calls_sub
