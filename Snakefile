@@ -488,6 +488,8 @@ rule infer_expressed_genes:
     log:
         "log/infer_expressed_genes_{clone}.log"
     conda: "envs/scNOVA.yaml"
+    resources:
+    	time = '7-00:00:00'
     shell:
         """
         module load foss/2019b
