@@ -11,7 +11,7 @@ Deeptool_result_final <- read.table(args[2], header=TRUE, sep ='\t', comment.cha
 Deeptool_result_final_new_all <- Deeptool_result_final[,5:ncol(Deeptool_result_final)]
 
 #for (k in 1:subclone_count){
-	clone_name <- strsplit(args[7], "input_user/Features_reshape_")[[1]][2]
+	clone_name <- strsplit(args[7], "result/Features_reshape_")[[1]][2]
 	clone_name <- strsplit(clone_name, "_orientation_CN_correct0.txt")[[1]][1]
 	filename <- paste0("result/Features_reshape_", clone_name, "_Resid_orientation.txt")
 	filename_IQR <- paste0("result/Features_reshape_", clone_name, "_Resid_orientation_IQR.txt")
