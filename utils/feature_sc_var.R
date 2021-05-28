@@ -10,6 +10,16 @@ subclone_uniq <- sort(unique(subclone_list[,2]))
 Deeptool_result_final <- read.table(args[2], header=TRUE, sep ='\t', comment.char = "")
 Deeptool_result_final_new_all <- Deeptool_result_final[,5:ncol(Deeptool_result_final)]
 
+##Sort the order of single-cells
+Deeptool_result_name <- as.data.frame(as.matrix(colnames(Deeptool_result_final_new_all)))
+Deeptool_result_name$index <- 0
+for (j in 1:nrow(Deeptool_result_name)){
+	Deeptool_result_name[j,1] <- strsplit(Deeptool_result_name[j,1], ".sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam")[[1]][1]
+	Deeptool_result_name[j,2] <- which(subclone_list[,1]==Deeptool_result_name[j,1])
+}
+Deeptool_result_final_new_all <- Deeptool_result_final_new_all[,order(Deeptool_result_name[,2])]
+
+
 #for (k in 1:subclone_count){
 	clone_name <- strsplit(args[7], "result/Features_reshape_")[[1]][2]
 	clone_name <- strsplit(clone_name, "_orientation_CN_correct0.txt")[[1]][1]
