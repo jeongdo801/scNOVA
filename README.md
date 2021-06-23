@@ -33,9 +33,10 @@ This workflow is mean to be run in a Unix-based operating system.
 
 
 ## Installation
+As of now, unix based tools and python packages are expected to be available via modules. R packages are automatically downloaded and used via conda.
 1. unix based tools : SAMtools/1.3.1-foss-2016b, biobambam2/2.0.76-foss-2016b, deeptools/2.5.1-foss-2016b-Python-2.7.12
 2. python packages : cuDNN, CUDA, TensorFlow, scikit-learn, matplotlib
-3. R packages : DESeq2, matrixStats, pheatmap, gplots, umap, Rtsne, factoextra, pracma, chromVAR, nabor, motifmatchr 
+3. R packages: handled via conda install. You can choose not to use conda, in which case you will need the following packages: DESeq2, matrixStats, pheatmap, gplots, umap, Rtsne, factoextra, pracma, chromVAR, nabor, motifmatchr 
 
 
 ## Setup
