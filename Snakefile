@@ -6,7 +6,7 @@ import os.path
  #                                                                             #
  # Set the sample name                                                         #
  # Update 20201028                                                                            #
-SAMPLE_NAME = "GM20509B"
+SAMPLE_NAME = "GM20509"
 CLONE_NAME = ["clone1", "clone2"]
  #                                                                             #
  #                                                                             #
@@ -14,7 +14,7 @@ CLONE_NAME = ["clone1", "clone2"]
  # 'bam' and to be names *.bam and *.bai                                       #
  #                                                                             #
 BAMFILE, = glob_wildcards("input_bam/{cell}.bam")
-#BAM_SC, = glob_wildcards("input_bam/{single_cells}.sort.mdup.bam")
+BAM_SC, = glob_wildcards("input_bam/{single_cells}.sort.mdup.bam")
 #                                                                             #
  #                                                                             #
 abbreviate_names = False
@@ -488,9 +488,6 @@ rule infer_expressed_genes:
     log:
         "log/infer_expressed_genes_{clone}.log"
     conda: "envs/scNOVA.yaml"
-#    resources:
-#    	time = "7-00:00:00",
-#	mem = "40 Gb"
     shell:
         """
         module load foss/2019b
@@ -549,7 +546,6 @@ rule infer_differential_gene_expression:
     conda: "envs/scNOVA.yaml"
     shell:
         """
-        #module load R/3.6.2-foss-2019b
         Rscript {params.infer_diff_gene_expression} {input.Genebody_NO} {input.clonality} {input.TSS_matrix} {input.GB_matrix} {input.CNN_result1} {input.CNN_result2} {input.input_matrix} {output}
         """
 
@@ -828,7 +824,7 @@ rule count_reads_genebody_haplo_sort_by_coordinate_genebody:
 
 #rule merge_feature_sc:
 #    input:
-#        feature_sc = expand("result_features_sc/Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_{single_cells}_wovar_exp.txt", s
+#        feature_sc = expand("result_features_sc/Features_reshape_all_orientation_norm_var_GC_CpG_RT_T_comb3_{single_cells}_wovar_exp.txt", single_cells=BAM_SC)
 #    output:
 #        "result_features_sc/" + SAMPLE_NAME + "_wovar_exp.txt"
 #    shell:
