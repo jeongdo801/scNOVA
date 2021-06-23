@@ -54,13 +54,15 @@ As of now, unix based tools and python packages are expected to be available via
 3. **Change the project name in the Snakefile**
 4. **Launch the run_pipeline.sh script**
 
-## Dependencies
+## Dependencies and conda
 This tool reduces the burden of installing R dependencies and their correct versions by using conda. After following the installation and setup (steps 1-3), use `snakemake --use-conda --conda-create-envs-only` to prepare the conda environment.
+
 Note 1: If you do not have a lot of space in your `HOME` directory (i.e. `~`), make sure conda installs packages into a directory where you have more space. To do so, open `~/.condarc` (which already might have content if you have used conda before) and add the following lines to it: 
 ```
 pkgs_dirs:
   - <path/to/directory_with_more_space/conda_pkgs/
 ```
+
 Note 2: If you want to install all dependencies manually and not use conda, simply remove `--use-conda` from `run_pipeline.sh`, which will make `snakemake` ignore all `conda` statements.
 
 ## References
