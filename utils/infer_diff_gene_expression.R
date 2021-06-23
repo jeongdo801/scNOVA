@@ -29,6 +29,16 @@ class_label_sce <- cbind(class_label, as.character(class_label_strict_subclone[,
 
 cond_label <- class_label_strict_subclone[,2]
 
+##Sort the order of single-cells
+GB_count_name <- as.data.frame(as.matrix(colnames(GB_count)))
+GB_count_name$index <- 0
+for (j in 1:nrow(GB_count_name)){
+	GB_count_name[j,1] <- strsplit(GB_count_name[j,1], ".sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam")[[1]][1]
+	GB_count_name[j,2] <- which(class_label_strict_subclone[,1]==GB_count_name[j,1])
+}
+GB_count <- GB_count[,order(GB_count_name[,2])]
+
+
 
 ##Load Gene information
 TSS_matrix <- read.table(args[3], header=TRUE, sep ='\t')

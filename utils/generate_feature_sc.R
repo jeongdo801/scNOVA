@@ -10,6 +10,32 @@ table_size <- read.table(args[5], header=F, sep ='\t', comment.char = "")
 TSS_matrix <- read.table(args[6], header=TRUE, sep ='\t')
 Deeptool_mapped <- read.table(args[7], header=TRUE, sep ='\t', comment.char = "")
 
+
+##Sort the order of single-cells
+Deeptool_result_final_new <- Deeptool_result_final[,5:ncol(Deeptool_result_final)]
+Deeptool_mapped_new <- Deeptool_mapped[,4:ncol(Deeptool_mapped)]
+subclone_list <- read.table("input_user/input_subclonality.txt", header=T, sep ='\t', comment.char = "")
+
+Deeptool_result_name <- as.data.frame(as.matrix(colnames(Deeptool_result_final_new)))
+Deeptool_result_name$index <- 0
+for (j in 1:nrow(Deeptool_result_name)){
+	Deeptool_result_name[j,1] <- strsplit(Deeptool_result_name[j,1], ".sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam")[[1]][1]
+	Deeptool_result_name[j,2] <- which(subclone_list[,1]==Deeptool_result_name[j,1])
+}
+Deeptool_result_final_new <- Deeptool_result_final_new[,order(Deeptool_result_name[,2])]
+Deeptool_result_final <- cbind(Deeptool_result_final[,1:4], Deeptool_result_final_new)
+
+
+Deeptool_mapped_name <- as.data.frame(as.matrix(colnames(Deeptool_mapped_new)))
+Deeptool_mapped_name$index <- 0
+for (j in 1:nrow(Deeptool_mapped_name)){
+	Deeptool_mapped_name[j,1] <- strsplit(Deeptool_mapped_name[j,1], ".sort.mdup.sc_pre_mono_sort_for_mark_uniq.bam")[[1]][1]
+	Deeptool_mapped_name[j,2] <- which(subclone_list[,1]==Deeptool_mapped_name[j,1])
+}
+Deeptool_mapped_new <- Deeptool_mapped_new[,order(Deeptool_mapped_name[,2])]
+Deeptool_mapped <- cbind(Deeptool_mapped[,1:3], Deeptool_mapped_new)
+
+
 #This is only needed for the plotting script
 FPKM <- read.table(args[8], header=T, sep ='\t', comment.char = "")
 TSS_matrix_woM <- TSS_matrix[TSS_matrix[,2]!="chrM",]
