@@ -61,6 +61,8 @@ Note 1: If you do not have a lot of space in your `HOME` directory (i.e. `~`), m
 ```
 pkgs_dirs:
   - <path/to/directory_with_more_space/conda_pkgs/
+envs_dirs:
+  - /g/korbel2/jeong/envs/
 ```
 
 Note 2: If you want to install all dependencies manually and not use conda, simply remove `--use-conda` from `run_pipeline.sh`, which will make `snakemake` ignore all `conda` statements.
