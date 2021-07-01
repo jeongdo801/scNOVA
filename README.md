@@ -67,6 +67,13 @@ envs_dirs:
 
 Note 2: If you want to install all dependencies manually and not use conda, simply remove `--use-conda` from `run_pipeline.sh`, which will make `snakemake` ignore all `conda` statements.
 
+### Rare conda issue
+A note on running hundreds of jobs at the same time (cluster environment):
+
+If running many concurrent jobs, a rare race condition can occur in which two R environments are activated at the same time. During this activation, a file is deleted for a short amount of time, which will throw an error if a separate activation is taking place at the same time. The issue is described [here](https://github.com/conda-forge/r-base-feedstock/issues/67) and can be worked around by applying [this fix](https://github.com/kpalin/r-base-feedstock/commit/9eda35bdc8ea2c2433cbc6b94c2e978b4d7cd8d4), which has not yet been merged into any branch unfortunately.
+
+The error that gets thrown looks like this: `/path/to/pipeline/.snakemake/conda/<hash>/lib/R/bin/R: line 248: /path/to/pipeline/.snakemake/conda/<hash>/lib/R/etc/ldpaths: No such file or directory`
+
 ## References
 
 For information on scTRIP see
