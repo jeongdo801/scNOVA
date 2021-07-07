@@ -60,9 +60,9 @@ This tool reduces the burden of installing R dependencies and their correct vers
 Note 1: If you do not have a lot of space in your `HOME` directory (i.e. `~`), make sure conda installs packages into a directory where you have more space. To do so, open `~/.condarc` (which already might have content if you have used conda before) and add the following lines to it: 
 ```
 pkgs_dirs:
-  - <path/to/directory_with_more_space/conda_pkgs/
+  - <path/to/directory_with_more_space>/envs/pkgs/
 envs_dirs:
-  - /g/korbel2/jeong/envs/
+  - <path/to/directory_with_more_space>/envs/
 ```
 
 Note 2: If you want to install all dependencies manually and not use conda, simply remove `--use-conda` from `run_pipeline.sh`, which will make `snakemake` ignore all `conda` statements.
