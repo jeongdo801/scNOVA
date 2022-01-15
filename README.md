@@ -5,7 +5,7 @@ scNOVA : Single-Cell Nucleosome Occupancy and genetic Variation Analysis - summa
 
 
 ## Overview of this workflow
-PART0. Pre-requirement step - preparation of single-cell genetic information:
+PART0. Pre-requirement step - preparation of single-cell genetic information using scTRIP analysis (Sanders et al. 2020):
 Mosaicatcher: https://github.com/friendsofstrandseq/mosaicatcher-pipeline
 <br/><br/>
 PART1. Read preprocessing
@@ -82,7 +82,7 @@ For detailed information on scNOVA see
 
 For information on scTRIP see
 
-> Sanders *et al.*, 2019 (doi: https://doi.org/10.1038/s41587-019-0366-x)
+> Sanders *et al.*, 2020 (doi: https://doi.org/10.1038/s41587-019-0366-x)
 
 
 
