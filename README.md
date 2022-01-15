@@ -75,6 +75,10 @@ If running many concurrent jobs, a rare race condition can occur in which two R 
 The error that gets thrown looks like this: `/path/to/pipeline/.snakemake/conda/<hash>/lib/R/bin/R: line 248: /path/to/pipeline/.snakemake/conda/<hash>/lib/R/etc/ldpaths: No such file or directory`
 
 ## References
+For detailed information on scNOVA see
+
+> Jeong and Grimes *et al.*, 2021 (https://www.biorxiv.org/content/10.1101/2021.11.11.468039v1)
+
 
 For information on scTRIP see
 
