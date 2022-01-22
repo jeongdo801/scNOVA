@@ -14,7 +14,7 @@ PART2. Read counting to generate single-cell genebody NO
 <br/><br/>
 PART3. Infer expressed genes of subclones
 <br/><br/>
-PART4. DE analysis of subclones
+PART4. DE analysis of subclones (default and alternative mode)
 <br/><br/>
 PART5. (Optional) Infer Single-cell TF motif accessibility using chromVAR (20210108 updated), by default, Roadmap epigenomics DHS (Enhancers) will be used to define CREs
 <br/><br/>
@@ -23,9 +23,9 @@ PART6. (Optional) Infer haplotype-resolved genebody NO (20210108 updated)
 Main output (GM20509 example data)
 1. Single-cell level NO table : result/GM20509_sort_geneid.txt (20210108 updated)
 2. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
-3. Infer differential expression table : result/Result_scNOVA_infer_expression_table.txt (20210108 updated)
-4. Heatmap and UMAP visualization of significant hits : result_plots/Result_scNOVA_plots_GM20509.pdf
-5. (Optional) Single-cell level TF motif deviation z-score : result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_GM20509.txt (20210108 updated)
+3. Infer differential expression table : result/Result_scNOVA_infer_expression_table.txt, result/result_PLSDA_{SAMPLE}.txt (20220121 updated)
+4. Heatmap and UMAP visualization of significant hits : result_plots/Result_scNOVA_plots_{SAMPLE}.pdf, result_plots/Result_scNOVA_plots_{SAMPLE}_alternative_PLSDA.pdf
+5. (Optional) Single-cell level TF motif deviation z-score : result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_{SAMPLE}.txt (20210108 updated)
 6. (Optional) Haplotype-resolved NO of genebody and CREs : result_haplo/Deeptool_Genebody_H1H2_sort.txt, result_haplo/Deeptool_DHS_2kb_H1H2_sort.txt (20210108 updated)
 <br/><br/> 
 ## System requirements
