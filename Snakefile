@@ -6,7 +6,7 @@ import os.path
  #                                                                             #
  # Set the sample name                                                         #
  # Update 20201028                                                                            #
-SAMPLE_NAME = "DEA5_77cells"
+SAMPLE_NAME = "CLL_24"
 CLONE_NAME = ["clone1", "clone2"]
  #                                                                             #
  #                                                                             #
@@ -63,7 +63,7 @@ rule all:
         expand("result_CNN/DNN_train20_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_CNN/DNN_train5_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_plots/Result_scNOVA_plots_{s}.pdf", s = SAMPLE_NAME),
-        expand("result_PLSDA_{s}.txt", s = SAMPLE_NAME),
+        expand("result/result_PLSDA_{s}.txt", s = SAMPLE_NAME),
         expand("result_plots/Result_scNOVA_plots_{s}_alternative_PLSDA.pdf", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb.tab", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb.npz", s = SAMPLE_NAME),
