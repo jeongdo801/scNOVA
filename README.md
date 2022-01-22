@@ -20,8 +20,8 @@ PART5. (Optional) Infer Single-cell TF motif accessibility using chromVAR (20210
 <br/><br/>
 PART6. (Optional) Infer haplotype-resolved genebody NO (20210108 updated)
 <br/><br/>
-Main output (GM20509 example data)
-1. Single-cell level NO table : result/GM20509_sort_geneid.txt (20210108 updated)
+Main output
+1. Single-cell level NO table : `result/{SAMPLE}_sort_geneid.txt` (20210108 updated)
 2. Infer expression probability for each clones : result_CNN/DNN_train80_output_ypred_clone1_annot.txt, result_CNN/DNN_train80_output_ypred_clone2_annot.txt
 3. Infer differential expression table : result/Result_scNOVA_infer_expression_table.txt, result/result_PLSDA_{SAMPLE}.txt (20220121 updated)
 4. Heatmap and UMAP visualization of significant hits : result_plots/Result_scNOVA_plots_{SAMPLE}.pdf, result_plots/Result_scNOVA_plots_{SAMPLE}_alternative_PLSDA.pdf
