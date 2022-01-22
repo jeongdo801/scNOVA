@@ -1,5 +1,5 @@
 Pred_PLS_R <- function(xtrain1, ytrain, xtest1, lv){
-source("/Users/jeong/Documents/Strand_Seq/Pipelines/pls_R.R")
+source("utils/script_PLSDA/pls_R_scNOVA.R")
 result_pls = pls_R(xtrain1, ytrain,lv);
 B <- matrix(0, lv,lv);
 that1 <- matrix(0, 1, lv);

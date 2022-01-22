@@ -15,5 +15,6 @@
     "count_sort_annotate_chrid_CREs" : "utils/count_sort_annotate_chrid_CREs.R",
     "generate_CREs_CN" : "utils/generate_CREs_CN.R",
     "NO_chromVAR" : "utils/NO_chromVAR.R",
+    "infer_diff_gene_expression_alt" : "utils/infer_diff_gene_expression_alt.R",
 }
 

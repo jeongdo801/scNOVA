@@ -6,7 +6,7 @@ import os.path
  #                                                                             #
  # Set the sample name                                                         #
  # Update 20201028                                                                            #
-SAMPLE_NAME = "GM20509"
+SAMPLE_NAME = "DEA5_77cells"
 CLONE_NAME = ["clone1", "clone2"]
  #                                                                             #
  #                                                                             #
@@ -63,15 +63,17 @@ rule all:
         expand("result_CNN/DNN_train20_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_CNN/DNN_train5_output_ypred_{c}_annot.txt", c = CLONE_NAME),
         expand("result_plots/Result_scNOVA_plots_{s}.pdf", s = SAMPLE_NAME),
+        expand("result_PLSDA_{s}.txt", s = SAMPLE_NAME),
+        expand("result_plots/Result_scNOVA_plots_{s}_alternative_PLSDA.pdf", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb.tab", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb.npz", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb_sort.txt", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb_sort_num.txt", s = SAMPLE_NAME),
         expand("result/{s}_CREs_2kb_sort_num_sort_for_chromVAR.txt", s = SAMPLE_NAME),
 #        expand("result/SC_CN_regions_all_hg38_v2_resize_2kb_sc.txt"),
-        expand("result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
-        expand("result/motif_dev_chromVAR_DHS_2kb_Enh_{s}.Rda", s = SAMPLE_NAME),
-        expand("result/motif_variability_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
+#        expand("result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
+#        expand("result/motif_dev_chromVAR_DHS_2kb_Enh_{s}.Rda", s = SAMPLE_NAME),
+#        expand("result/motif_variability_chromVAR_DHS_2kb_Enh_{s}.txt", s = SAMPLE_NAME),
         expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W1.bam", cell=BAMFILE),
         expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.W2.bam", cell=BAMFILE),
         expand("bam/{cell}.sc_pre_mono_sort_for_mark_uniq.bam.C1.bam", cell=BAMFILE),
@@ -549,6 +551,27 @@ rule infer_differential_gene_expression:
         Rscript {params.infer_diff_gene_expression} {input.Genebody_NO} {input.clonality} {input.TSS_matrix} {input.GB_matrix} {input.CNN_result1} {input.CNN_result2} {input.input_matrix} {output}
         """
 
+rule infer_differential_gene_expression_alt:
+    input:
+        Genebody_NO = "result/" + SAMPLE_NAME + "_sort.txt",
+        clonality = "input_user/input_subclonality.txt",
+        TSS_matrix = "utils/Strand_seq_matrix_TSS_for_SVM.txt",
+        GB_matrix = "utils/Strand_seq_matrix_Genebody_for_SCDE.txt",
+        CNN_result1 = "result_CNN/DNN_train80_output_ypred_clone1_annot.txt",
+        CNN_result2 = "result_CNN/DNN_train80_output_ypred_clone2_annot.txt",
+        input_matrix = "input_user/input_SV_affected_genes.txt",
+    output:
+        result_table = "result/result_PLSDA_" + SAMPLE_NAME + ".txt",
+        result_plot = "result_plots/Result_scNOVA_plots_" + SAMPLE_NAME + "_alternative_PLSDA.pdf",
+    params:
+        infer_diff_gene_expression_alt = config["infer_diff_gene_expression_alt"]
+    log:
+        "log/infer_diff_gene_expression_alt.log"
+    conda: "envs/scNOVA.yaml"
+    shell:
+        """
+        Rscript {params.infer_diff_gene_expression_alt} {input.Genebody_NO} {input.clonality} {input.TSS_matrix} {input.GB_matrix} {input.CNN_result1} {input.CNN_result2} {input.input_matrix} {output.result_table} {output.result_plot}
+        """
 
 #
 # PART V
@@ -619,26 +642,26 @@ rule count_sort_annotate_chrid_CREs_sort:
 #        Rscript {params.generate_CREs_CN} {input.Result_enh_prom} {input.DHS_matrix_resize} {input.sv_calls} {output}
 #        """
 
-rule NO_chromVAR:
-    input:
-        DHS_annot_resize = "utils/Result_enh_prom_sort_new_num_sort_for_chromVAR.txt",
-        DHS_matrix_resize = "utils/regions_all_hg38_v2_resize_2kb_sort_num_sort_for_chromVAR.bed",
-        SC_CN_DHS = "input_user/sv_calls_all_print_CREs.txt",
-        data1_resize = "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num_sort_for_chromVAR.txt",
-        class_label = "input_user/input_subclonality.txt",
-    output:
-        motif_zscore = "result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
-        motif_dev = "result/motif_dev_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".Rda",
-        motif_variability = "result/motif_variability_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
-    params:
-        NO_chromVAR = config["NO_chromVAR"]
-    log:
-        "log/NO_chromVAR.log"
-    conda: "envs/scNOVA.yaml"
-    shell:
-        """
-        Rscript {params.NO_chromVAR} {input.DHS_annot_resize} {input.DHS_matrix_resize} {input.SC_CN_DHS} {input.data1_resize} {input.class_label} {output.motif_zscore} {output.motif_dev} {output.motif_variability} 
-        """
+#rule NO_chromVAR:
+#    input:
+#        DHS_annot_resize = "utils/Result_enh_prom_sort_new_num_sort_for_chromVAR.txt",
+#        DHS_matrix_resize = "utils/regions_all_hg38_v2_resize_2kb_sort_num_sort_for_chromVAR.bed",
+#        SC_CN_DHS = "input_user/sv_calls_all_print_CREs.txt",
+#        data1_resize = "result/" + SAMPLE_NAME + "_CREs_2kb_sort_num_sort_for_chromVAR.txt",
+#        class_label = "input_user/input_subclonality.txt",
+#    output:
+#        motif_zscore = "result/motif_dev_zscore_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
+#        motif_dev = "result/motif_dev_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".Rda",
+#        motif_variability = "result/motif_variability_chromVAR_DHS_2kb_Enh_" + SAMPLE_NAME + ".txt",
+#    params:
+#        NO_chromVAR = config["NO_chromVAR"]
+#    log:
+#        "log/NO_chromVAR.log"
+#    conda: "envs/scNOVA.yaml"
+#    shell:
+#        """
+#        Rscript {params.NO_chromVAR} {input.DHS_annot_resize} {input.DHS_matrix_resize} {input.SC_CN_DHS} {input.data1_resize} {input.class_label} {output.motif_zscore} {output.motif_dev} {output.motif_variability} 
+#        """
 
 
 
