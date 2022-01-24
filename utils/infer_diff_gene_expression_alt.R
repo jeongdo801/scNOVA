@@ -159,7 +159,9 @@ Y_auto <- auto_R(Y)
 
 
 #First pls model using all features
-lv <- 20
+if (length(conds)>20){lv <- 20}
+if (length(conds)<=20){lv <- (length(conds)-1)}
+
 source("utils/script_PLSDA/pls_R_scNOVA.R")
 result_pls_all = pls_R(X_auto, Y_auto,lv);
 
