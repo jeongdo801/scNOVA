@@ -52,7 +52,9 @@ As of now, unix based tools and python packages are expected to be available via
 	* Add the genes within copy number changed region to mask in the infer differential expression result, if it's not provided, genes will not be masked. (input_user/input_SV_affected_genes.txt) 
 
 3. **Change the project name in the Snakefile**
-4. **Launch the run_pipeline.sh script**
+4. **Setup dependencies (conda is recommended as follows)**
+	* `snakemake -j 4 --use-conda --conda-create-envs-only`
+5. **Launch the run_pipeline.sh script**
 
 ## Dependencies and conda
 This tool reduces the burden of installing R dependencies and their correct versions by using conda. After following the installation and setup (steps 1-3), use `snakemake -j 4 --use-conda --conda-create-envs-only` to prepare the conda environment.
