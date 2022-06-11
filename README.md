@@ -76,6 +76,20 @@ If running many concurrent jobs, a rare race condition can occur in which two R 
 
 The error that gets thrown looks like this: `/path/to/pipeline/.snakemake/conda/<hash>/lib/R/bin/R: line 248: /path/to/pipeline/.snakemake/conda/<hash>/lib/R/etc/ldpaths: No such file or directory`
 
+## Configuration for the special use
+By default, to make CNN feature, scNOVA performs library size normalization followed by local copy number normalization.
+However, for the samples with more dramatic karyotypic changes (e.g. changes in ploidy status), we provide a option to use copy number normalization before normalization by library size. To do so, users can change two lines in the Snake.config.json
+```
+{
+    ...
+    "count_norm" : "utils/count_norm_ploidy.R",
+    ...
+    "combine_features" : "utils/combine_features_ploidy.R",
+    ...
+}
+```
+
+
 ## References
 For detailed information on scNOVA see
 
