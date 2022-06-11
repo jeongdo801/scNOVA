@@ -78,7 +78,7 @@ The error that gets thrown looks like this: `/path/to/pipeline/.snakemake/conda/
 
 ## Configuration for the special use
 By default, to make CNN feature, scNOVA performs library size normalization followed by local copy number normalization.
-However, for the samples with more dramatic karyotypic changes (e.g. changes in ploidy status), we provide a option to use copy number normalization before normalization by library size. To do so, users can change two lines in the Snake.config.json
+However, for the samples with more dramatic karyotypic changes (e.g. changes in ploidy status), we provide a option to use copy number normalization before normalization by library size. To do so, users can change two lines in the `Snake.config.json`
 ```
 {
     ...
