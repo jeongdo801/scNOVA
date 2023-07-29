@@ -93,7 +93,7 @@ However, for the samples with more dramatic karyotypic changes (e.g. changes in 
 ## References
 For detailed information on scNOVA see
 
-> Jeong and Grimes *et al.*, 2021 (https://www.nature.com/articles/s41587-022-01551-4)
+> Jeong and Grimes *et al.*, 2022 (https://www.nature.com/articles/s41587-022-01551-4)
 
 
 For information on scTRIP see
